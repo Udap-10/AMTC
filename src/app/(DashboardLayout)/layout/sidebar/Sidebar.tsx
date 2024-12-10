@@ -1,7 +1,6 @@
-import { useMediaQuery, Box, Drawer } from "@mui/material";
+import { Box, Drawer, useMediaQuery } from "@mui/material";
+import { Logo, Sidebar } from 'react-mui-sidebar';
 import SidebarItems from "./SidebarItems";
-import { Upgrade } from "./Updrade";
-import { Sidebar, Logo } from 'react-mui-sidebar';
 
 interface ItemType {
   isMobileSidebarOpen: boolean;
@@ -72,13 +71,20 @@ const MSidebar = ({
               {/* ------------------------------------------- */}
               {/* Logo */}
               {/* ------------------------------------------- */}
-              <Logo img="/images/logos/dark-logo.svg" />
+              <img
+                src="/images/logos/PLogo.jpeg"
+                alt="logo"
+                width="150"
+                height="150"
+
+              />
+
               <Box>
                 {/* ------------------------------------------- */}
                 {/* Sidebar Items */}
                 {/* ------------------------------------------- */}
                 <SidebarItems />
-                <Upgrade />
+                
               </Box>
             </Sidebar >
           </Box>
@@ -117,12 +123,24 @@ const MSidebar = ({
           {/* ------------------------------------------- */}
           {/* Logo */}
           {/* ------------------------------------------- */}
-          <Logo img="/images/logos/dark-logo.svg" />
+          <Logo 
+                img="/images/logos/ProjectLogo.png" 
+                style={
+                 {
+                  width: "5px",
+                  height: "5px",
+                  fill: "none",
+                 }
+                }
+                width={5}
+                height={5}
+                alt="logo"
+              />
           {/* ------------------------------------------- */}
           {/* Sidebar Items */}
           {/* ------------------------------------------- */}
           <SidebarItems />
-          <Upgrade />
+          
         </Sidebar>
       </Box>
       {/* ------------------------------------------- */}

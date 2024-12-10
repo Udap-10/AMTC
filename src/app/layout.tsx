@@ -1,7 +1,7 @@
 "use client";
 import { baselightTheme } from "@/utils/theme/DefaultColors";
-import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 
 export default function RootLayout({
   children,
@@ -20,3 +20,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+
