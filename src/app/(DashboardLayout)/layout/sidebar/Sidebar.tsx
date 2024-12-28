@@ -1,5 +1,6 @@
-import { Box, Drawer, useMediaQuery } from "@mui/material";
-import { Logo, Sidebar } from 'react-mui-sidebar';
+import { Box, Drawer, Typography, useMediaQuery } from "@mui/material";
+import { Logo, Sidebar } from "react-mui-sidebar";
+import { useThemeContext } from "../../context/ThemeContextProvider/page"; // Adjust path to your context file
 import SidebarItems from "./SidebarItems";
 
 interface ItemType {
@@ -13,22 +14,21 @@ const MSidebar = ({
   onSidebarClose,
   isSidebarOpen,
 }: ItemType) => {
+  const { darkMode } = useThemeContext(); // Accessing darkMode from context
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"));
 
   const sidebarWidth = "270px";
 
   // Custom CSS for short scrollbar
   const scrollbarStyles = {
-    '&::-webkit-scrollbar': {
-      width: '7px',
-
+    "&::-webkit-scrollbar": {
+      width: "7px",
     },
-    '&::-webkit-scrollbar-thumb': {
-      backgroundColor: '#eff2f7',
-      borderRadius: '15px',
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "#eff2f7",
+      borderRadius: "15px",
     },
   };
-
 
   if (lgUp) {
     return (
@@ -38,9 +38,6 @@ const MSidebar = ({
           flexShrink: 0,
         }}
       >
-        {/* ------------------------------------------- */}
-        {/* Sidebar for desktop */}
-        {/* ------------------------------------------- */}
         <Drawer
           anchor="left"
           open={isSidebarOpen}
@@ -49,44 +46,47 @@ const MSidebar = ({
             sx: {
               boxSizing: "border-box",
               ...scrollbarStyles,
+              backgroundColor: darkMode ? "#333" : "#fff", // Set background based on darkMode
             },
           }}
         >
-          {/* ------------------------------------------- */}
-          {/* Sidebar Box */}
-          {/* ------------------------------------------- */}
-          <Box
-            sx={{
-              height: "100%",
-            }}
-          >
+          <Box sx={{ height: "100%" }}>
             <Sidebar
-              width={'270px'}
+              width={"270px"}
               collapsewidth="80px"
               open={isSidebarOpen}
               themeColor="#5d87ff"
               themeSecondaryColor="#49beff"
               showProfile={false}
             >
-              {/* ------------------------------------------- */}
-              {/* Logo */}
-              {/* ------------------------------------------- */}
               <img
-                src="/images/logos/PLogo.jpeg"
-                alt="logo"
-                width="150"
-                height="150"
-
+                src="/images/logos/2.jpg"
+                style={{
+                  width: "170px",
+                  height: "155px",
+                  fill: "none",
+                  paddingTop: "10px",
+                  marginLeft: "50px",
+                  marginTop: "15px",
+                  borderRadius: "50%",
+                }}
               />
+              <Typography
+                variant="h6"
+                align="center"
+                padding={2}
+                style={{
+                  fontWeight: "bold",
+                  color: darkMode ? "white" : "black", // Change text color based on darkMode
+                }}
+              >
+                Smart Farm Security
+              </Typography>
 
               <Box>
-                {/* ------------------------------------------- */}
-                {/* Sidebar Items */}
-                {/* ------------------------------------------- */}
                 <SidebarItems />
-                
               </Box>
-            </Sidebar >
+            </Sidebar>
           </Box>
         </Drawer>
       </Box>
@@ -106,12 +106,9 @@ const MSidebar = ({
         },
       }}
     >
-      {/* ------------------------------------------- */}
-      {/* Sidebar Box */}
-      {/* ------------------------------------------- */}
       <Box px={2}>
         <Sidebar
-          width={'270px'}
+          width={"270px"}
           collapsewidth="80px"
           isCollapse={false}
           mode="light"
@@ -120,40 +117,20 @@ const MSidebar = ({
           themeSecondaryColor="#49beff"
           showProfile={false}
         >
-          {/* ------------------------------------------- */}
-          {/* Logo */}
-          {/* ------------------------------------------- */}
-          <Logo 
-                img="/images/logos/ProjectLogo.png" 
-                style={
-                 {
-                  width: "5px",
-                  height: "5px",
-                  fill: "none",
-                 }
-                }
-                width={5}
-                height={5}
-                alt="logo"
-              />
-          {/* ------------------------------------------- */}
-          {/* Sidebar Items */}
-          {/* ------------------------------------------- */}
+          <Logo
+            img="/images/logos/2.jpg"
+            style={{
+              width: "150px",
+              height: "145px",
+              fill: "none",
+              Padding: "50px",
+            }}
+          />
           <SidebarItems />
-          
         </Sidebar>
       </Box>
-      {/* ------------------------------------------- */}
-      {/* Sidebar For Mobile */}
-      {/* ------------------------------------------- */}
-
     </Drawer>
   );
 };
 
 export default MSidebar;
-
-
-
-
-

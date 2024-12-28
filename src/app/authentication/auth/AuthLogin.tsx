@@ -1,12 +1,11 @@
-import React from "react";
 import {
   Box,
-  Typography,
-  FormGroup,
-  FormControlLabel,
   Button,
-  Stack,
   Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Stack,
+  Typography,
 } from "@mui/material";
 import Link from "next/link";
 
@@ -62,7 +61,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         <FormGroup>
           <FormControlLabel
             control={<Checkbox defaultChecked />}
-            label="Remeber this Device"
+            label="Remember this Device"
           />
         </FormGroup>
         <Typography
@@ -86,7 +85,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         fullWidth
         component={Link}
         href="/"
-        type="submit"
+        type ="submit"
       >
         Sign In
       </Button>

@@ -1,13 +1,13 @@
 "use client";
-import { Grid, Box, Card, Typography, Stack } from "@mui/material";
-import Link from "next/link";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
+import { Box, Card, Grid, Stack, Typography } from "@mui/material";
+import Link from "next/link";
 import AuthRegister from "../auth/AuthRegister";
 
 const Register2 = () => (
   <PageContainer title="Register" description="this is Register page">
     <Box
+     
       sx={{
         position: "relative",
         "&:before": {
@@ -43,7 +43,7 @@ const Register2 = () => (
             sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}
           >
             <Box display="flex" alignItems="center" justifyContent="center">
-              <Logo />
+              {/* <Logo /> */}
             </Box>
             <AuthRegister
               subtext={
@@ -51,9 +51,11 @@ const Register2 = () => (
                   variant="subtitle1"
                   textAlign="center"
                   color="textSecondary"
+                  fontSize={30}
+                  fontFamily={"times new roman"}
                   mb={1}
                 >
-                  Your Social Campaigns
+                  Sign Up
                 </Typography>
               }
               subtitle={

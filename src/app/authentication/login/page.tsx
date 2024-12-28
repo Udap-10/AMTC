@@ -3,7 +3,6 @@ import { Box, Card, Grid, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 // components
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import AuthLogin from "../auth/AuthLogin";
 
 const Login2 = () => {
@@ -45,7 +44,7 @@ const Login2 = () => {
               sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}
             >
               <Box display="flex" alignItems="center" justifyContent="center">
-                <Logo />
+                {/* <Logo/> */}
               </Box>
               <AuthLogin
                 subtext={
@@ -53,9 +52,11 @@ const Login2 = () => {
                     variant="subtitle1"
                     textAlign="center"
                     color="textSecondary"
+                    fontSize={30}
+                    fontFamily={"times new roman"}
                     mb={1}
                   >
-                    Your Social Campaigns
+                    Sign In
                   </Typography>
                 }
                 subtitle={
@@ -70,7 +71,7 @@ const Login2 = () => {
                       variant="h6"
                       fontWeight="500"
                     >
-                      New to Modernize?
+                      Don't have an account?
                     </Typography>
                     <Typography
                       component={Link}

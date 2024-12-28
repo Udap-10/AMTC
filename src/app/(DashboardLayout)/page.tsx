@@ -1,15 +1,23 @@
 'use client'
-import { Grid, Box } from '@mui/material';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
+import { Box, Grid } from '@mui/material';
 // components
-import SalesOverview from '@/app/(DashboardLayout)/components/dashboard/SalesOverview';
-import YearlyBreakup from '@/app/(DashboardLayout)/components/dashboard/YearlyBreakup';
-import RecentTransactions from '@/app/(DashboardLayout)/components/dashboard/RecentTransactions';
-import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/ProductPerformance';
 import Blog from '@/app/(DashboardLayout)/components/dashboard/Blog';
 import MonthlyEarnings from '@/app/(DashboardLayout)/components/dashboard/MonthlyEarnings';
+import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/ProductPerformance';
+import RecentTransactions from '@/app/(DashboardLayout)/components/dashboard/RecentTransactions';
+import SalesOverview from '@/app/(DashboardLayout)/components/dashboard/SalesOverview';
+import YearlyBreakup from '@/app/(DashboardLayout)/components/dashboard/YearlyBreakup';
 
 const Dashboard = () => {
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token'); // Replace with your actual auth check
+  //   if (!token) {
+  //     router.push('/'); // Redirect to login page if not authenticated
+  //   }
+  // }, [router]);
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
       <Box>

@@ -1,23 +1,27 @@
-import React, { useState } from "react";
-import Link from "next/link";
+"use client";
 import {
   Avatar,
   Box,
-  Menu,
   Button,
   IconButton,
-  MenuItem,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import Link from "next/link";
+import { useState } from "react";
 
-import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
+import { IconUser } from "@tabler/icons-react";
 
 const Profile = () => {
-  const [anchorEl2, setAnchorEl2] = useState(null);
-  const handleClick2 = (event: any) => {
+  
+  const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null);
+  
+  const handleClick2 = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl2(event.currentTarget);
   };
+
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
@@ -30,12 +34,13 @@ const Profile = () => {
         color="inherit"
         aria-controls="msgs-menu"
         aria-haspopup="true"
+        onClick={handleClick2}
         sx={{
           ...(typeof anchorEl2 === "object" && {
             color: "primary.main",
           }),
         }}
-        onClick={handleClick2}
+       
       >
         <Avatar
           src="/images/profile/user-1.jpg"
@@ -63,24 +68,13 @@ const Profile = () => {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem component={Link} href="/ProfilePage/profile" onClick={handleClose2}>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>
-          <ListItemText>My Profile</ListItemText>
+          <ListItemText >My Profile</ListItemText>
         </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <IconMail width={20} />
-          </ListItemIcon>
-          <ListItemText>My Account</ListItemText>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <IconListCheck width={20} />
-          </ListItemIcon>
-          <ListItemText>My Tasks</ListItemText>
-        </MenuItem>
+        
         <Box mt={1} py={1} px={2}>
           <Button
             href="/authentication/login"
@@ -96,5 +90,4 @@ const Profile = () => {
     </Box>
   );
 };
-
 export default Profile;

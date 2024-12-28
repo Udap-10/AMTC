@@ -1,10 +1,11 @@
-import React from 'react';
-import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button } from '@mui/material';
-import PropTypes from 'prop-types';
+"use client";
+import { AppBar, Badge, Box, Button, IconButton, Stack, Toolbar, styled } from '@mui/material';
 import Link from 'next/link';
+import PropTypes from 'prop-types';
+import React from 'react';
 // components
-import Profile from './Profile';
 import { IconBellRinging, IconMenu } from '@tabler/icons-react';
+import Profile from './Profile';
 
 interface ItemType {
   toggleMobileSidebar:  (event: React.MouseEvent<HTMLElement>) => void;
@@ -47,7 +48,6 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
           <IconMenu width="20" height="20" />
         </IconButton>
 
-
         <IconButton
           size="large"
           aria-label="show 11 new notifications"
@@ -56,7 +56,7 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
           aria-haspopup="true"
         >
           <Badge variant="dot" color="primary">
-            <IconBellRinging size="21" stroke="1.5" />
+            <IconBellRinging size="21" stroke="1.5"  />
           </Badge>
 
         </IconButton>

@@ -7,10 +7,10 @@ import NavItem from "./NavItem";
 const SidebarItems = ({ toggleMobileSidebar }: any) => {
   const pathname = usePathname();
   const pathDirect = pathname;
-
+  
   return (
     <Box sx={{ px: 3 }}>
-      <List sx={{ pt: 0 }} className="sidebarNav" component="div">
+      <List sx={{ pt: 0,}} className="sidebarNav" component="div" >
         {Menuitems.map((item) => {
           // {/********SubHeader**********/}
           if (item.subheader) {
@@ -25,7 +25,8 @@ const SidebarItems = ({ toggleMobileSidebar }: any) => {
                 key={item.id}
                 pathDirect={pathDirect}
                 onClick={toggleMobileSidebar}
-              />
+                
+                 />
             );
           }
         })}
