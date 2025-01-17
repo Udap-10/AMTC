@@ -3,6 +3,17 @@
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
 import { Box, Grid, Paper, Typography } from "@mui/material";
+import { keyframes } from "@emotion/react";
+
+// Animation for the fade-in effect
+const fadeIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
 
 const AboutUsPage = () => {
   return (
@@ -11,13 +22,16 @@ const AboutUsPage = () => {
       description="Learn more about Smart Farm Security and our mission."
     >
       <DashboardCard title="About Us">
-        <Box>
+        <Box sx={{ animation: `${fadeIn} 1.5s ease-in` }}>
           {/* Image Section */}
           <Box
             display="flex"
             justifyContent="center"
             alignItems="center"
             mb={4}
+            sx={{
+              animation: `${fadeIn} 1.5s ease-in-out`,
+            }}
           >
             <img
               src="/images/logos/Animal Data.png"
@@ -26,8 +40,10 @@ const AboutUsPage = () => {
                 width: "80%",
                 maxWidth: "500px",
                 borderRadius: "8px",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                boxShadow: "0 6px 12px rgba(0, 0, 0, 0.1)",
+                transition: "transform 0.3s ease",
               }}
+              className="imageHover"
             />
           </Box>
 
@@ -43,6 +59,10 @@ const AboutUsPage = () => {
                     borderRadius: 2,
                     textAlign: "center",
                     backgroundColor: "#f0f9ff", // Light blue background
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      transition: "transform 0.3s ease-in-out",
+                    },
                   }}
                 >
                   <Typography variant="h6" gutterBottom>
@@ -65,6 +85,10 @@ const AboutUsPage = () => {
                     borderRadius: 2,
                     textAlign: "center",
                     backgroundColor: "#fef6e4", // Light yellow background
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      transition: "transform 0.3s ease-in-out",
+                    },
                   }}
                 >
                   <Typography variant="h6" gutterBottom>
@@ -86,6 +110,10 @@ const AboutUsPage = () => {
                     borderRadius: 2,
                     textAlign: "center",
                     backgroundColor: "#f7f6f2", // Light gray background
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      transition: "transform 0.3s ease-in-out",
+                    },
                   }}
                 >
                   <Typography variant="h6" gutterBottom>
@@ -107,6 +135,10 @@ const AboutUsPage = () => {
                     borderRadius: 2,
                     textAlign: "center",
                     backgroundColor: "#e6ffe6", // Light green background
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      transition: "transform 0.3s ease-in-out",
+                    },
                   }}
                 >
                   <Typography variant="h6" gutterBottom>
