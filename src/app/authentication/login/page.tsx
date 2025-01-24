@@ -2,7 +2,7 @@
 import { Box, Card, Grid, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 // components
-import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
+import PageContainer from "@/app/DashboardLayout/components/container/PageContainer";
 import AuthLogin from "../auth/AuthLogin";
 
 const Login2 = () => {

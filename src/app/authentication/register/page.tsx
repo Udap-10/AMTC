@@ -1,5 +1,5 @@
 "use client";
-import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
+import PageContainer from "@/app/DashboardLayout/components/container/PageContainer";
 import { Box, Card, Grid, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import AuthRegister from "../auth/AuthRegister";
