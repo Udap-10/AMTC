@@ -2,8 +2,10 @@
 
 import PageContainer from "@/app/DashboardLayout/components/container/PageContainer";
 import DashboardCard from "@/app/DashboardLayout/components/shared/DashboardCard";
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { useThemeContext } from "@/app/DashboardLayout/context/ThemeContextProvider/page";
 import { keyframes } from "@emotion/react";
+import { Box, Grid, Paper, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 // Animation for the fade-in effect
 const fadeIn = keyframes`
@@ -16,6 +18,8 @@ const fadeIn = keyframes`
 `;
 
 const AboutUsPage = () => {
+  const theme = useTheme();
+  const { darkMode } = useThemeContext();
   return (
     <PageContainer
       title="About Us"
@@ -58,14 +62,19 @@ const AboutUsPage = () => {
                     padding: 3,
                     borderRadius: 2,
                     textAlign: "center",
-                    backgroundColor: "#f0f9ff", // Light blue background
+                    backgroundColor: darkMode ? "#1e1e1e" : "#f0f9ff", // Dark/Light mode support
+                    color: darkMode ? "#fff" : "#000", // Adjust text color
                     "&:hover": {
                       transform: "scale(1.05)",
                       transition: "transform 0.3s ease-in-out",
                     },
                   }}
                 >
-                  <Typography variant="h6" gutterBottom style={{fontWeight: 'bold'}}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    style={{ fontWeight: "bold" }}
+                  >
                     Our Mission
                   </Typography>
                   <Typography>
@@ -84,14 +93,21 @@ const AboutUsPage = () => {
                     padding: 3,
                     borderRadius: 2,
                     textAlign: "center",
-                    backgroundColor: "#fef6e4", // Light yellow background
+                    backgroundColor:
+                      theme.palette.mode === "dark" ? "#2c2c2c" : "#fef6e4", // Dark gray for dark mode
+                    color:
+                      theme.palette.mode === "dark" ? "#ffffff" : "#000000",
                     "&:hover": {
                       transform: "scale(1.05)",
                       transition: "transform 0.3s ease-in-out",
                     },
                   }}
                 >
-                  <Typography variant="h6" gutterBottom style={{fontWeight: 'bold'}}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    style={{ fontWeight: "bold" }}
+                  >
                     What We Do
                   </Typography>
                   <Typography>
@@ -109,14 +125,21 @@ const AboutUsPage = () => {
                     padding: 3,
                     borderRadius: 2,
                     textAlign: "center",
-                    backgroundColor: "#f7f6f2", // Light gray background
+                    backgroundColor:
+                      theme.palette.mode === "dark" ? "#2c2c2c" : "#f7f6f2", // Dark gray for dark mode
+                    color:
+                      theme.palette.mode === "dark" ? "#ffffff" : "#000000",
                     "&:hover": {
                       transform: "scale(1.05)",
                       transition: "transform 0.3s ease-in-out",
                     },
                   }}
                 >
-                  <Typography variant="h6" gutterBottom style={{fontWeight: 'bold'}}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    style={{ fontWeight: "bold" }}
+                  >
                     Why Choose Us?
                   </Typography>
                   <Typography>
@@ -134,14 +157,21 @@ const AboutUsPage = () => {
                     padding: 3,
                     borderRadius: 2,
                     textAlign: "center",
-                    backgroundColor: "#e6ffe6", // Light green background
+                    backgroundColor:
+                      theme.palette.mode === "dark" ? "#1b3b1b" : "#e6ffe6", // Dark green for dark mode
+                    color:
+                      theme.palette.mode === "dark" ? "#ffffff" : "#000000",
                     "&:hover": {
                       transform: "scale(1.05)",
                       transition: "transform 0.3s ease-in-out",
                     },
                   }}
                 >
-                  <Typography variant="h6" gutterBottom style={{fontWeight: 'bold'}}>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    style={{ fontWeight: "bold" }}
+                  >
                     Our Vision
                   </Typography>
                   <Typography>

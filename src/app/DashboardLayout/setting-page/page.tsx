@@ -19,6 +19,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const SettingPage = () => {
@@ -32,25 +34,77 @@ const SettingPage = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // State for delete confirmation
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (newPassword !== confirmNewPassword) {
       alert("New passwords do not match. Please try again.");
       return;
     }
-    if (newPassword.length < 8) {
-      alert("Password must be at least 8 characters long.");
-      return;
+
+    try {
+      console.log("🔄 Sending password change request...");
+
+      // ✅ Send request to API (session-based authentication)
+      const response = await axios.put(
+        "/api/users/passwordChange", // ✅ API route
+        {
+          oldPassword: currentPassword, // Ensure old password is sent
+          newPassword,
+          confirmPassword: newPassword, // Match backend field name
+        },
+        { withCredentials: true } // ✅ Ensure session is included
+      );
+
+      console.log("✅ API Response:", response.data);
+
+      alert(response.data.message);
+
+      // ✅ Reset state & UI
+      setShowChangePassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (error) {
+      console.error("❌ Error changing password:", error);
+
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error response:", error.response);
+        alert(error.response?.data?.error || "Something went wrong");
+      } else {
+        alert("Something went wrong");
+      }
     }
-    alert("Password changed successfully!");
-    setShowChangePassword(false);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
   };
 
-  const handleDeleteAccount = () => {
-    alert("Account deleted successfully!");
-    setShowDeleteConfirmation(false);
+  // Delete account function
+
+  const router = useRouter(); // Initialize the router
+
+  const handleDeleteAccount = async () => {
+    try {
+      console.log("🔄 Sending account deletion request...");
+
+      const response = await fetch(`/api/users/Delete`, {
+        method: "DELETE",
+        credentials: "include", // ✅ Ensures session is sent
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("✅ Account deleted successfully!");
+        localStorage.clear();
+        router.push("/"); // Redirect to login page
+      } else {
+        console.error("❌ Error deleting account:", data.error);
+        alert(
+          data.error || "Something went wrong while deleting your account."
+        );
+      }
+    } catch (error) {
+      console.error("❌ Network error while deleting account:", error);
+      alert("Something went wrong while deleting your account.");
+    }
   };
 
   return (
@@ -141,12 +195,7 @@ const SettingPage = () => {
           </Typography>
           <FormControlLabel
             control={<Switch defaultChecked />}
-            label="Enable Email Notifications"
-            sx={{ mb: 1 }}
-          />
-          <FormControlLabel
-            control={<Switch />}
-            label="Enable Push Notifications"
+            label="Enable Notifications"
             sx={{ mb: 1 }}
           />
 

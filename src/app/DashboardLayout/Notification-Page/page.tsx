@@ -1,60 +1,48 @@
 "use client";
-import React, { useState } from "react";
 import PageContainer from "@/app/DashboardLayout/components/container/PageContainer";
+import DeleteIcon from "@mui/icons-material/Delete"; // Delete Icon
+import MarkAsReadIcon from "@mui/icons-material/Drafts"; // Mark as Read Icon
 import {
-  IconButton,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
+  Button,
   Card,
   CardContent,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
 } from "@mui/material";
-import MarkAsReadIcon from "@mui/icons-material/Drafts"; // Mark as Read Icon
-import DeleteIcon from "@mui/icons-material/Delete"; // Delete Icon
+import { useState } from "react";
 
 // Sample notifications with different types (farmer added, animal detections)
 const initialNotifications = [
   {
     id: 1,
-    message: "A new farmer has been added to the system.",
-    time: "5 minutes ago",
+    message: "A new farmer has been added",
+    time: "5 min ago",
     isRead: false,
-    type: "farmer",
   },
-  {
-    id: 2,
-    message: "Most detected animal: Elephant in the north field.",
-    time: "1 hour ago",
-    isRead: false,
-    type: "animal",
-  },
-  {
-    id: 3,
-    message: "Camera maintenance scheduled for tomorrow.",
-    time: "2 hours ago",
-    isRead: false,
-    type: "system",
-  },
+  { id: 2, message: "Elephant detected", time: "1 hour ago", isRead: false },
+  { id: 3, message: "Camera maintenance", time: "2 hours ago", isRead: false },
   {
     id: 4,
-    message: "New update available for your system.",
+    message: "System update available",
     time: "3 hours ago",
     isRead: false,
-    type: "system",
   },
 ];
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [openDialog, setOpenDialog] = useState(false);
-  const [notificationToDelete, setNotificationToDelete] = useState<number | null>(null);
+  const [notificationToDelete, setNotificationToDelete] = useState<
+    number | null
+  >(null);
 
   const handleMarkAsRead = (id: number) => {
     setNotifications((prev) =>
@@ -105,7 +93,9 @@ const NotificationPage = () => {
                 <ListItem
                   divider
                   sx={{
-                    backgroundColor: notification.isRead ? "transparent" : "#b0e892",
+                    backgroundColor: notification.isRead
+                      ? "transparent"
+                      : "#b0e892",
                     padding: "10px",
                     borderRadius: "8px",
                   }}

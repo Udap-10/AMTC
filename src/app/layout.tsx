@@ -1,8 +1,9 @@
 "use client";
 
 import { CssBaseline } from "@mui/material";
-import { ThemeContextProvider } from "./DashboardLayout/context/ThemeContextProvider/page"; // Adjust the path if necessary
+import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "./DashboardLayout/context/ThemeContextProvider/AuthContext";
+import { ThemeContextProvider } from "./DashboardLayout/context/ThemeContextProvider/page"; // Adjust the path if necessary
 
 export default function RootLayout({
   children,
@@ -12,15 +13,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Ensure that only ThemeContextProvider is used without a static theme */}
-        <AuthProvider>
-        <ThemeContextProvider>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          {children}
-        </ThemeContextProvider>
-        </AuthProvider>
+        <SessionProvider>
+          <AuthProvider>
+            <ThemeContextProvider>
+              <CssBaseline />
+              <ThemeWrapper>{children}</ThemeWrapper>{" "}
+              {/* Ensures hooks work correctly */}
+            </ThemeContextProvider>
+          </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );
 }
+
+// ✅ Fix: Create a wrapper to properly apply themes
+const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div>{children}</div>;
+};
