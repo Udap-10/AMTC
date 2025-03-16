@@ -1,139 +1,247 @@
 "use client";
 
 import PageContainer from "@/app/DashboardLayout/components/container/PageContainer";
-import { useThemeContext } from "@/app/DashboardLayout/context/ThemeContextProvider/page"; // Import Dark Mode Context
-import { Box, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles"; // Import useTheme from MUI
+import { useThemeContext } from "@/app/DashboardLayout/context/ThemeContextProvider/page";
 import {
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import {
+  BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
   LinearScale,
-  LineElement,
-  PointElement,
   Title,
   Tooltip,
 } from "chart.js";
 import { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
-// Registering chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
 );
 
+const allDzongkhags = [
+  "Bumthang",
+  "Chukha",
+  "Dagana",
+  "Gasa",
+  "Haa",
+  "Lhuentse",
+  "Mongar",
+  "Paro",
+  "Pema Gatshel",
+  "Punakha",
+  "Samdrup Jongkhar",
+  "Samtse",
+  "Sarpang",
+  "Thimphu",
+  "Trashigang",
+  "Trashiyangtse",
+  "Trongsa",
+  "Tsirang",
+  "Wangdue Phodrang",
+  "Zhemgang",
+];
+
+const dzongkhagAbbr = [
+  "BT",
+  "CK",
+  "DG",
+  "GS",
+  "HA",
+  "LT",
+  "MG",
+  "PR",
+  "PG",
+  "PK",
+  "SJ",
+  "SM",
+  "SP",
+  "TP",
+  "TG",
+  "TY",
+  "TR",
+  "TS",
+  "WP",
+  "ZG",
+];
+
+const barColors = [
+  "#4e79a7",
+  "#f28e2c",
+  "#e15759",
+  "#76b7b2",
+  "#59a14f",
+  "#edc949",
+  "#af7aa1",
+  "#ff9da7",
+  "#9c755f",
+  "#bab0ab",
+  "#1f77b4",
+  "#ff7f0e",
+  "#2ca02c",
+  "#d62728",
+  "#9467bd",
+  "#8c564b",
+  "#e377c2",
+  "#7f7f7f",
+  "#bcbd22",
+  "#17becf",
+];
+
 const DataAnalysisPage = () => {
-  const [dzongkhags, setDzongkhags] = useState<string[]>([]);
-  const [animalCounts, setAnimalCounts] = useState<number[]>([]);
-  const theme = useTheme(); // Access MUI theme
-  const { darkMode } = useThemeContext(); // Access dark mode state
+  const [animalCounts, setAnimalCounts] = useState<number[]>(Array(20).fill(0));
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
+  const [animalTypesByDzongkhag, setAnimalTypesByDzongkhag] = useState<
+    Record<string, string[]>
+  >({});
+  const [totalAnimalsDetected, setTotalAnimalsDetected] = useState(0);
+  const [averageAnimalsPerDzongkhag, setAverageAnimalsPerDzongkhag] =
+    useState("0");
+  const [maxAnimalsDetected, setMaxAnimalsDetected] = useState(0);
+  const [maxAnimalsDzongkhag, setMaxAnimalsDzongkhag] = useState("N/A");
+
+  const theme = useTheme();
+  const { darkMode } = useThemeContext();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
+  const handlePrevious = () => {
+    setSelectedYear((prevYear) => prevYear - 1);
+  };
+
+  const handleNext = () => {
+    setSelectedYear((prevYear) => prevYear + 1);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/DataAnalysis");
+        const response = await fetch(
+          `/api/AnimalTypesPerDzongkhag?year=${selectedYear}`
+        );
         const data = await response.json();
+
         if (data.success) {
-          setDzongkhags(data.dzongkhags);
-          setAnimalCounts(data.animalCounts);
+          // Update chart counts
+          const updatedCounts = allDzongkhags.map((dzongkhag) => {
+            const index = data.dzongkhags.indexOf(dzongkhag);
+            return index !== -1 ? data.animalCounts[index] : 0;
+          });
+          setAnimalCounts(updatedCounts);
+
+          // Update Animal types per Dzongkhag
+          const convertedAnimalTypes: Record<string, string[]> = {};
+          Object.keys(data.animalTypesPerDzongkhag).forEach((dzongkhag) => {
+            const types = data.animalTypesPerDzongkhag[dzongkhag];
+            convertedAnimalTypes[dzongkhag] = Object.entries(types).map(
+              ([animalName, count]) => `${animalName} (${count})`
+            );
+          });
+          setAnimalTypesByDzongkhag(convertedAnimalTypes);
+
+          // Update summary metrics
+          const total = updatedCounts.reduce((sum, count) => sum + count, 0);
+          const average =
+            updatedCounts.length > 0
+              ? (total / updatedCounts.length).toFixed(2)
+              : "0";
+          const max = Math.max(...updatedCounts);
+          const maxDzongkhags = allDzongkhags.filter(
+            (_, idx) => updatedCounts[idx] === max
+          );
+
+          setTotalAnimalsDetected(total);
+          setAverageAnimalsPerDzongkhag(average);
+          setMaxAnimalsDetected(max);
+          setMaxAnimalsDzongkhag(maxDzongkhags.join(", "));
         }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
+
     fetchData();
-  }, []);
+  }, [selectedYear]); // 🔥 Now this re-runs whenever selectedYear changes
 
-  // Compute key metrics dynamically
-  const totalAnimalsDetected = animalCounts.reduce(
-    (sum, count) => sum + count,
-    0
-  );
-  const averageAnimalsPerDzongkhag =
-    animalCounts.length > 0
-      ? (totalAnimalsDetected / animalCounts.length).toFixed(2)
-      : "0";
-  const maxAnimalsIndex = animalCounts.indexOf(Math.max(...animalCounts));
-  const maxAnimalsDetected = animalCounts[maxAnimalsIndex] || 0;
-  const maxAnimalsDzongkhag = dzongkhags[maxAnimalsIndex] || "N/A";
-
-  const data = {
-    labels: dzongkhags,
+  const chartData = {
+    labels: dzongkhagAbbr,
     datasets: [
       {
         label: "Number of Animals Detected",
         data: animalCounts,
-        borderColor: darkMode
-          ? "rgba(255, 255, 255, 1)"
-          : "rgba(75, 192, 192, 1)", // Light or dark mode color
-        backgroundColor: darkMode
-          ? "rgba(255, 255, 255, 0.2)"
-          : "rgba(75, 192, 192, 0.2)",
-        tension: 0.4,
+        backgroundColor: barColors,
+        borderColor: darkMode ? "#fff" : "#333",
+        borderWidth: 1,
       },
     ],
   };
 
-  const options = {
+  const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       title: {
         display: true,
-        text: "Monthly Intrusion Detection in Each Dzongkhag",
-        font: {
-          size: 16,
-          weight: "bold" as const,
-        },
-        color: darkMode ? "#ffffff" : "#333", // Adjust color for dark mode
+        text: "Animal Intrusion Detection by Dzongkhag",
+        font: { size: isMobile ? 16 : 20 },
+        color: darkMode ? "#fff" : "#000",
       },
+      legend: { display: false },
       tooltip: {
-        mode: "index" as const,
-        intersect: false,
+        callbacks: {
+          afterLabel: (tooltipItem: any) => {
+            const index = tooltipItem.dataIndex;
+            const dzongkhag = allDzongkhags[index];
+            const animals = animalTypesByDzongkhag[dzongkhag];
+            return animals?.length
+              ? animals.map((animal) => `• ${animal}`)
+              : ["• No animals detected"];
+          },
+        },
       },
     },
     scales: {
       x: {
         title: {
           display: true,
-          text: "Dzongkhag",
-          font: {
-            size: 15,
-            weight: "bold" as const,
-          },
-          color: darkMode ? "#ffffff" : "black",
+          text: "Dzongkhags (Abbreviated)",
+          color: darkMode ? "#fff" : "#000",
+          font: { size: 14, weight: 600 },
         },
-        ticks: {
-          font: {
-            size: 13,
-            weight: "normal" as const,
-          },
-          color: darkMode ? "#ffffff" : "black",
-        },
+        ticks: { color: darkMode ? "#fff" : "#000", font: { size: 12 } },
       },
-
       y: {
+        beginAtZero: true,
         title: {
           display: true,
           text: "Number of Animals Detected",
-          font: {
-            size: 15,
-            weight: "bold" as const,
-          },
-          color: darkMode ? "#ffffff" : "black",
+          color: darkMode ? "#fff" : "#000",
+          font: { size: 14, weight: 600 },
         },
-        ticks: {
-          font: {
-            size: 13,
-            weight: "normal" as const,
-          },
-          color: darkMode ? "#ffffff" : "black",
-        },
+        ticks: { color: darkMode ? "#fff" : "#000" },
       },
     },
   };
@@ -143,56 +251,171 @@ const DataAnalysisPage = () => {
       title="Data Analysis Page"
       description="Analyze data on animal intrusion detection events"
     >
-      <Box
+      <Card
         sx={{
-          backgroundColor: theme.palette.background.default, // ✅ Dynamic Background Color
-          color: theme.palette.text.primary, // ✅ Dynamic Text Color
-          padding: 2,
-          borderRadius: 2,
-          boxShadow: 2,
+          p: isMobile ? 2 : 4,
+          borderRadius: 3,
+          bgcolor: darkMode ? "#1a1a1a" : "#fafafa",
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: "bold", mb: 3 }}>
-          Intrusion Detection Analysis
-        </Typography>
-
-        <Box>
-          <Typography
-            variant="h6"
-            sx={{ mb: 2, fontSize: "1.25rem", fontWeight: "bold" }}
+        <CardContent>
+          {/* Title + Year Navigation in same row */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+              flexWrap: "wrap", // optional: handles small screens better
+            }}
           >
-            Data Overview
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 3, fontSize: "1.1rem" }}>
-            This graph shows the number of animals detected per Dzongkhag.
-          </Typography>
+            {/* Title on the left */}
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                color: "#2e7d32",
+                fontSize: isMobile ? 18 : 22,
+              }}
+            >
+              Intrusion Detection Analysis
+            </Typography>
 
-          {/* Chart Section */}
-          <Box sx={{ height: 400 }}>
-            <Line data={data} options={options} />
+            {/* Year Navigation on the right */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconButton
+                onClick={handlePrevious}
+                sx={{ color: "#027c68", fontSize: 28, fontWeight: "bold" }}
+              >
+                &lt;
+              </IconButton>
+              <Typography
+                variant="subtitle1"
+                fontWeight="bold"
+                sx={{ fontSize: 20 }}
+              >
+                {selectedYear}
+              </Typography>
+              <IconButton
+                onClick={handleNext}
+                sx={{ color: "#027c68", fontSize: 28, fontWeight: "bold" }}
+              >
+                &gt;
+              </IconButton>
+            </Box>
+            <Typography
+              variant="body2"
+              sx={{ mb: 2, fontSize: isMobile ? 13 : 16 }}
+            >
+              Visual representation of animal intrusion detection counts across
+              20 Dzongkhags.
+            </Typography>
+
+            {/* Bar Chart Section */}
+            <Box sx={{ width: "100%", overflowX: "auto" }}>
+              <Box
+                sx={{
+                  minWidth: 600,
+                  height: isMobile ? 300 : 450,
+                }}
+              >
+                <Bar data={chartData} options={chartOptions} />
+              </Box>
+            </Box>
           </Box>
 
-          {/* Additional Data Section */}
           <Typography
             variant="h6"
-            sx={{ mt: 5, fontSize: "1.25rem", fontWeight: "bold" }}
+            sx={{ fontWeight: 700, color: "#2e7d32", mb: 2 }}
           >
-            Key Metrics:
+            Dzongkhag Abbreviations & Color Legend
           </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="body2" sx={{ fontSize: "1rem" }} mb={1}>
-              Total Animals Detected: {totalAnimalsDetected}
-            </Typography>
-            <Typography variant="body2" sx={{ fontSize: "1rem" }} mb={1}>
-              Average Animals Per Dzongkhag: {averageAnimalsPerDzongkhag}
-            </Typography>
-            <Typography variant="body2" sx={{ fontSize: "1rem" }}>
-              Maximum Animals Detected in Dzongkhag: {maxAnimalsDetected} (
-              {maxAnimalsDzongkhag})
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
+
+          <TableContainer
+            component={Paper}
+            sx={{ width: "100%", overflowX: "auto", mb: 4 }}
+          >
+            <Table size="small">
+              <TableHead
+                sx={{ backgroundColor: darkMode ? "#333" : "#f5f5f5" }}
+              >
+                <TableRow>
+                  <TableCell>
+                    <strong>Color</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Abbreviation</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Dzongkhag Name</strong>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {allDzongkhags.map((dzongkhag, index) => (
+                  <TableRow key={dzongkhag}>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          bgcolor: barColors[index],
+                          borderRadius: 1,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>{dzongkhagAbbr[index]}</TableCell>
+                    <TableCell>{dzongkhag}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "#2e7d32", mb: 2 }}
+          >
+            Key Metrics Summary
+          </Typography>
+
+          <TableContainer
+            component={Paper}
+            sx={{ width: "100%", overflowX: "auto" }}
+          >
+            <Table size={isMobile ? "small" : "medium"}>
+              <TableBody>
+                <TableRow
+                  sx={{ backgroundColor: darkMode ? "#2a2d34" : "#e3f2fd" }}
+                >
+                  <TableCell>
+                    <strong>Total Animals Detected</strong>
+                  </TableCell>
+                  <TableCell>{totalAnimalsDetected}</TableCell>
+                </TableRow>
+                <TableRow
+                  sx={{ backgroundColor: darkMode ? "#263238" : "#f1f8e9" }}
+                >
+                  <TableCell>
+                    <strong>Average Animals per Dzongkhag</strong>
+                  </TableCell>
+                  <TableCell>{averageAnimalsPerDzongkhag}</TableCell>
+                </TableRow>
+                <TableRow
+                  sx={{ backgroundColor: darkMode ? "#3e2723" : "#fff3e0" }}
+                >
+                  <TableCell>
+                    <strong>Max Animals Detected (Dzongkhag)</strong>
+                  </TableCell>
+                  <TableCell>
+                    {maxAnimalsDetected} ({maxAnimalsDzongkhag})
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
     </PageContainer>
   );
 };

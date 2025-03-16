@@ -40,11 +40,12 @@ export const authOptions = {
           throw new Error("❌ Incorrect password");
         }
 
-        // ✅ Ensure username is correctly assigned in the returned object
+        // ✅ Return additional user fields (including profile photo)
         return {
-          id: user._id.toString(), // Ensures NextAuth recognizes the user ID
-          username: user.username, // Ensures username is passed instead of name
+          id: user._id.toString(),
+          username: user.username,
           email: user.email,
+          profilePhoto: user.profilePhoto || null, // 🔥 Include profile photo
         };
       },
     }),
@@ -52,32 +53,32 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, user }: { token: any; user?: any }) {
-      console.log("🔑 JWT Callback - Before:", token); // Debugging
+      console.log("🔑 JWT Callback - Before:", token);
 
-      // ✅ Assign username and email correctly
       if (user) {
         token.id = user.id;
-        token.username = user.username; // Ensure username is used
+        token.username = user.username;
         token.email = user.email;
+        token.image = user.profilePhoto || null; // ✅ Include profile photo in JWT
       }
 
-      console.log("🔑 JWT Callback - After:", token); // Debugging
+      console.log("🔑 JWT Callback - After:", token);
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
-      console.log("📂 Session Callback - Before:", session); // Debugging
 
-      // ✅ Correctly set session.user with username instead of name
+    async session({ session, token }: { session: any; token: any }) {
+      console.log("📂 Session Callback - Before:", session);
+
       if (session.user) {
         session.user.id = token.id;
         session.user.username = token.username;
         session.user.email = token.email;
+        session.user.image = token.image || null; // ✅ Assign image from token
 
-        // 🔹 Remove unwanted 'name' field if it exists
         delete session.user.name;
       }
 
-      console.log("📂 Session Callback - After:", session); // Debugging
+      console.log("📂 Session Callback - After:", session);
       return session;
     },
   },

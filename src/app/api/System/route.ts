@@ -1,6 +1,6 @@
 import { connect } from "@/dbconfig/dbconfig";
+import SystemDetails from "@/models/SystemDetails";
 import System from "@/models/systemModels";
-import User from "@/models/userModels";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET: Fetch all systems or a specific system by systemID
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     let systems;
     if (systemID) {
-      systems = await System.findOne({ systemID: Number(systemID) });
+      systems = await System.findOne({ systemID: systemID });
       if (!systems) {
         return NextResponse.json(
           { message: "System not found" },
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         );
       }
     } else {
-      systems = await System.find();
+      systems = await System.find(); // fetch all if no systemID
     }
 
     return NextResponse.json(systems, { status: 200 });
@@ -36,31 +36,23 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
-    const { systemID, CID, installationDate, camera, raspberryPi, gsm } = body;
+    const {
+      systemID,
+      systemName,
+      password,
+      location,
+      macAddress,
+      installationDate,
+    } = body;
 
-    if (
-      !systemID ||
-      !CID ||
-      !installationDate ||
-      !camera ||
-      !raspberryPi ||
-      !gsm
-    ) {
+    if (!systemID || !systemName || !password || !location || !macAddress) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        { message: "All required fields must be provided" },
         { status: 400 }
       );
     }
 
     await connect();
-
-    const userExists = await User.findOne({ CID: String(CID) });
-    if (!userExists) {
-      return NextResponse.json(
-        { message: "CID not found in user database" },
-        { status: 400 }
-      );
-    }
 
     const systemExists = await System.findOne({ systemID });
     if (systemExists) {
@@ -72,14 +64,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const newSystem = new System({
       systemID,
-      CID,
+      systemName,
+      password,
+      location,
+      macAddress,
       installationDate: installationDate || Date.now(),
-      camera,
-      raspberryPi,
-      gsm,
     });
 
     await newSystem.save();
+
     return NextResponse.json(newSystem, { status: 201 });
   } catch (error: any) {
     console.error("Error saving system:", error);
@@ -93,7 +86,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (error.code === 11000) {
       return NextResponse.json(
-        { message: "Duplicate system ID", error: error.message },
+        { message: "Duplicate systemID or macAddress", error: error.message },
         { status: 400 }
       );
     }
@@ -105,25 +98,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-// PUT: Edit an existing system
-export async function PUT(req: NextRequest) {
+// PATCH: Update system data by systemID
+export async function PATCH(req: NextRequest): Promise<NextResponse> {
   try {
-    const systemID = req.nextUrl.searchParams.get("systemID"); // Get systemID from query params
-    const updateData = await req.json(); // Get only the updated fields
+    await connect();
+
+    const systemID = req.nextUrl.searchParams.get("systemID");
+    const updateData = await req.json();
 
     if (!systemID) {
       return NextResponse.json(
-        { message: "System ID is required" },
+        { message: "systemID is required" },
         { status: 400 }
       );
     }
 
-    await connect();
-
     const updatedSystem = await System.findOneAndUpdate(
-      { systemID }, // Find by systemID
-      { $set: updateData }, // Update only provided fields
-      { new: true, runValidators: true } // Return updated document and apply validation
+      { systemID },
+      { $set: updateData },
+      { new: true, runValidators: true }
     );
 
     if (!updatedSystem) {
@@ -134,9 +127,9 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(updatedSystem, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { message: "Server error", error: (error as Error).message },
+      { message: "Server error", error: error.message },
       { status: 500 }
     );
   }
@@ -145,6 +138,8 @@ export async function PUT(req: NextRequest) {
 // DELETE: Delete a system by systemID
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
+    await connect();
+
     const systemID = req.nextUrl.searchParams.get("systemID");
 
     if (!systemID) {
@@ -154,26 +149,26 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    await connect();
+    // Delete from System schema
+    const deleteResult = await System.deleteOne({ systemID });
 
-    const system = await System.findOne({ systemID: Number(systemID) });
-    if (!system) {
+    if (deleteResult.deletedCount === 0) {
       return NextResponse.json(
         { message: "System not found" },
         { status: 404 }
       );
     }
 
-    // Use deleteOne() instead of remove()
-    await System.deleteOne({ systemID: Number(systemID) });
+    // Also delete from SystemDetails schema
+    await SystemDetails.deleteOne({ systemID });
 
     return NextResponse.json(
-      { message: "System deleted successfully" },
+      { message: "System deleted successfully from both schemas" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
-      { message: "Server error", error: (error as any).message },
+      { message: "Server error", error: error.message },
       { status: 500 }
     );
   }

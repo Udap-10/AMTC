@@ -12,6 +12,7 @@ import {
   IconButton,
   Stack,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useSession } from "next-auth/react"; // Import session
 import { useRouter } from "next/navigation";
@@ -19,14 +20,31 @@ import { useEffect, useState } from "react";
 
 import {
   CartesianGrid,
-  Legend,
-  Tooltip as RechartsTooltip,
+  Cell,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Scatter,
   ScatterChart,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+
+const MONTH_COLORS = [
+  "#8884d8",
+  "#8dd1e1",
+  "#82ca9d",
+  "#a4de6c",
+  "#d0ed57",
+  "#ffc658",
+  "#ff8042",
+  "#ffbb28",
+  "#ff7300",
+  "#d0ed57",
+  "#a4de6c",
+  "#82ca9d",
+];
 
 const AnnouncementPage: React.FC = () => {
   const { data: session, status } = useSession(); // Get session
@@ -36,8 +54,13 @@ const AnnouncementPage: React.FC = () => {
   const [farmersData, setFarmersData] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentMonthData, setCurrentMonthData] = useState<any[]>([]); // State to hold the data for the current month
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // State to hold the selected year
   const [tableData, setTableData] = useState<any[]>([]);
   const [animalData, setAnimalData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false); // State to track loading
+  const [monthlyAnimalData, setMonthlyAnimalData] = useState<any[]>([]);
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
 
   interface Announcement {
     message: string;
@@ -45,6 +68,20 @@ const AnnouncementPage: React.FC = () => {
     date: string;
     time: string;
   }
+  const ALL_MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const [announcement, setAnnouncement] = useState<any>(null);
 
@@ -75,16 +112,11 @@ const AnnouncementPage: React.FC = () => {
   }, []); // Empty dependency array to run this once on mount
 
   const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    setSelectedYear((prevYear) => prevYear - 1);
   };
 
   const handleNext = () => {
-    if (currentIndex < 0) {
-      // Adjust this logic if you have more than one announcement
-      setCurrentIndex(currentIndex + 1);
-    }
+    setSelectedYear((prevYear) => prevYear + 1);
   };
 
   const monthsArray = [
@@ -101,6 +133,34 @@ const AnnouncementPage: React.FC = () => {
     "Nov",
     "Dec",
   ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/AnimalMonthWise?year=${selectedYear}`);
+        const json = await res.json();
+        if (json.success) {
+          // Ensure all 12 months are included
+          const mapped = ALL_MONTHS.map((month) => {
+            const found = json.data.find(
+              (item: { month: string }) => item.month === month
+            );
+            return { month, count: found ? found.count : 0 };
+          });
+          setMonthlyAnimalData(mapped);
+        } else {
+          console.error("API returned success: false");
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedYear]);
 
   // Simulate data for each day of the month
   const generateMonthData = (month: number) => {
@@ -258,12 +318,13 @@ const AnnouncementPage: React.FC = () => {
     <Box sx={{ padding: 1, position: "relative" }}>
       <Box>
         <Typography
-          variant="h6"
+          variant="h5"
           fontWeight="bold"
-          sx={{ color: "forestgreen" }}
+          sx={{ color: "forestgreen", mt: -4, mb: 3 }} // Move up slightly, keep space below
         >
           Announcements
         </Typography>
+
         <Card
           elevation={3}
           sx={{
@@ -412,151 +473,314 @@ const AnnouncementPage: React.FC = () => {
           </Card>
         </Grid>
 
-        {/* Data Analysis Section with Scatter Plot */}
-        <Grid item xs={6}>
-          <Card
-            elevation={3}
-            sx={{ padding: 4, borderRadius: "18px", marginTop: 3 }}
-          >
-            <Typography variant="h6" fontWeight="bold" sx={{ marginBottom: 2 }}>
-              Data Analysis
-            </Typography>
-            <ResponsiveContainer width="100%" height={250}>
-              <ScatterChart
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              >
-                <CartesianGrid />
-                <XAxis type="number" dataKey="day" name="Day" />
-                <YAxis
-                  type="number"
-                  dataKey="animalsDetected"
-                  name="Animals Detected"
-                />
-                <RechartsTooltip cursor={{ strokeDasharray: "3 3" }} />
-                <Legend />
-                <Scatter
-                  name="Animals Detected"
-                  data={currentMonthData}
-                  fill="#027c68"
-                  shape="circle"
-                />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </Card>
-        </Grid>
-
-        {/* Calendar Section */}
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Card
             elevation={3}
             sx={{
-              padding: 2,
-              borderRadius: "12px",
-              marginTop: 3,
-              height: "400px",
+              padding: 4,
+              borderRadius: "18px",
+              marginTop: 1,
             }}
           >
+            {/* Header Row: Title (Left) and Month Navigation (Right) */}
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: 2,
+                marginBottom: 1,
               }}
             >
-              <IconButton
-                onClick={handlePreviousMonth}
-                sx={{ color: "#027c68" }}
+              {/* Title */}
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{
+                  color: isDarkMode ? "#90caf9" : "#027c68",
+                  fontSize: "20px",
+                  marginUp: 1,
+                }}
               >
-                &lt;
-              </IconButton>
-              <Typography variant="h6" fontWeight="bold">
-                {monthsArray[currentDate.getMonth()]}{" "}
-                {currentDate.getFullYear()}
+                Date-Wise Animal Detection Analysis
               </Typography>
-              <IconButton onClick={handleNextMonth} sx={{ color: "#027c68" }}>
-                &gt;
-              </IconButton>
+
+              {/* Month Navigation */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton
+                  onClick={handlePreviousMonth}
+                  sx={{
+                    color: isDarkMode ? "#90caf9" : "#027c68",
+                    fontSize: "32px",
+                  }}
+                >
+                  <Typography sx={{ fontSize: 32, fontWeight: "bold" }}>
+                    &lt;
+                  </Typography>
+                </IconButton>
+
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  sx={{
+                    color: isDarkMode ? "#fff" : "#333",
+                    fontSize: "20px",
+                  }}
+                >
+                  {monthsArray[currentDate.getMonth()]}{" "}
+                  {currentDate.getFullYear()}
+                </Typography>
+
+                <IconButton
+                  onClick={handleNextMonth}
+                  sx={{
+                    color: isDarkMode ? "#90caf9" : "#027c68",
+                    fontSize: "32px",
+                  }}
+                >
+                  <Typography sx={{ fontSize: 32, fontWeight: "bold" }}>
+                    &gt;
+                  </Typography>
+                </IconButton>
+              </Box>
             </Box>
 
-            {/* Calendar Grid */}
+            {/* Scatter Plot Chart */}
+            <ResponsiveContainer width="100%" height={320}>
+              <ScatterChart
+                margin={{ top: 20, right: 30, left: 30, bottom: 50 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={isDarkMode ? "#444" : "#ccc"}
+                />
+
+                <XAxis
+                  type="number"
+                  dataKey="day"
+                  name="Date"
+                  domain={[
+                    1,
+                    new Date(
+                      currentDate.getFullYear(),
+                      currentDate.getMonth() + 1,
+                      0
+                    ).getDate(),
+                  ]}
+                  label={{
+                    value: "Date",
+                    position: "insideBottom",
+                    dy: 30,
+                    style: {
+                      textAnchor: "middle",
+                      fontWeight: "bold",
+                      fill: isDarkMode ? "#fff" : "#333",
+                      fontSize: 18,
+                    },
+                  }}
+                  tick={{
+                    fontWeight: "bold",
+                    fill: isDarkMode ? "#fff" : "#333",
+                    fontSize: 16,
+                  }}
+                />
+
+                <YAxis
+                  type="number"
+                  dataKey="animalsDetected"
+                  name="Count"
+                  label={{
+                    value: "Animals Count",
+                    angle: -90,
+                    position: "insideLeft",
+                    dx: -20,
+                    style: {
+                      textAnchor: "middle",
+                      fontWeight: "bold",
+                      fill: isDarkMode ? "#fff" : "#333",
+                      fontSize: 18,
+                    },
+                  }}
+                  tick={{
+                    fontWeight: "bold",
+                    fill: isDarkMode ? "#fff" : "#333",
+                    fontSize: 16,
+                  }}
+                />
+
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length > 0) {
+                      const data = payload[0].payload;
+                      return (
+                        <div
+                          style={{
+                            backgroundColor: isDarkMode ? "#1e1e1e" : "white",
+                            border: `1px solid ${isDarkMode ? "#666" : "#ccc"}`,
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            fontWeight: "bold",
+                            fontSize: "14px",
+                            color: isDarkMode ? "#fff" : "#000",
+                          }}
+                        >
+                          <div>Date: {data.day}</div>
+                          <div>Count: {data.animalsDetected}</div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+
+                <Scatter
+                  name="Animals Detected"
+                  data={currentMonthData}
+                  fill={isDarkMode ? "#90caf9" : "#027c68"}
+                  shape="circle"
+                />
+              </ScatterChart>
+            </ResponsiveContainer>
+
+            {/* Legend below chart */}
+            <Box sx={{ textAlign: "center", marginTop: 0 }}>
+              <Typography
+                variant="subtitle1"
+                fontWeight="bold"
+                sx={{ color: "#027c68", fontSize: "18px" }}
+              >
+                ● Animals Detected
+              </Typography>
+            </Box>
+          </Card>
+        </Grid>
+
+        {/* Pie Chart Card - Monthly Analysis */}
+        <Grid item xs={12}>
+          <Card
+            elevation={3}
+            sx={{ padding: 4, borderRadius: "18px", marginTop: 4 }}
+          >
+            {/* Header with Title and Year Navigation */}
             <Box
               sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
-                gap: "4px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 3,
               }}
             >
-              {/* Weekdays Header */}
-              {["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"].map((day) => (
+              {/* Title */}
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ color: "#027c68", fontSize: "20px" }}
+              >
+                Monthly Animal Detection Overview
+              </Typography>
+
+              {/* Year Navigation */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton
+                  onClick={handlePrevious}
+                  sx={{ color: "#027c68", fontSize: 28, fontWeight: "bold" }}
+                >
+                  &lt;
+                </IconButton>
                 <Typography
-                  key={day}
-                  variant="body2"
-                  sx={{
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    color: "#027c68",
-                    padding: "8px 0",
-                  }}
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  sx={{ fontSize: 20 }}
                 >
-                  {day}
+                  {selectedYear}
                 </Typography>
-              ))}
-
-              {/* Padding for Days Before First Day */}
-              {Array.from({
-                length:
-                  (new Date(
-                    currentDate.getFullYear(),
-                    currentDate.getMonth(),
-                    1
-                  ).getDay() +
-                    6) %
-                  7,
-              }).map((_, index) => (
-                <Box key={`empty-${index}`} sx={{ height: "40px" }} />
-              ))}
-
-              {/* Days of the Month */}
-              {Array.from(
-                {
-                  length: new Date(
-                    currentDate.getFullYear(),
-                    currentDate.getMonth() + 1,
-                    0
-                  ).getDate(),
-                },
-                (_, i) => i + 1
-              ).map((day) => (
-                <Box
-                  key={day}
-                  sx={{
-                    padding: "8px",
-                    textAlign: "center",
-                    backgroundColor: isToday(day, currentDate)
-                      ? "#28a745"
-                      : day === selectedDate?.getDate()
-                      ? "#027c68" // Selected date background
-                      : "#f8f9fa", // Default background
-                    color:
-                      isToday(day, currentDate) ||
-                      day === selectedDate?.getDate()
-                        ? "white"
-                        : "#495057",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    boxShadow:
-                      isToday(day, currentDate) ||
-                      day === selectedDate?.getDate()
-                        ? "0 2px 4px rgba(0, 0, 0, 0.2)"
-                        : "",
-                    fontWeight: isToday(day, currentDate) ? "bold" : "normal",
-                  }}
-                  onClick={() => handleDateClick(day)}
+                <IconButton
+                  onClick={handleNext}
+                  sx={{ color: "#027c68", fontSize: 28, fontWeight: "bold" }}
                 >
-                  {day}
-                </Box>
-              ))}
+                  &gt;
+                </IconButton>
+              </Box>
+            </Box>
+
+            {/* Pie Chart and Legend Side by Side */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              {/* Pie Chart (Left Side) */}
+              <ResponsiveContainer width="70%" height={420}>
+                <PieChart>
+                  <Pie
+                    data={monthlyAnimalData}
+                    dataKey="count"
+                    nameKey="month"
+                    isAnimationActive={true}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={170}
+                    innerRadius={60} // donut-style
+                    label={false} // <<< Hide labels completely
+                    labelLine={false}
+                    fill="#8884d8"
+                  >
+                    {monthlyAnimalData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={MONTH_COLORS[index % MONTH_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name) => [`${value}`, name]} />
+                </PieChart>
+              </ResponsiveContainer>
+
+              {/* Vertical Legend (Right Side) */}
+              <Box
+                sx={{
+                  width: { xs: "100%", md: "35%" },
+                  maxHeight: 420,
+                  overflowY: "auto",
+                  pr: 2,
+                  mt: { xs: 3, md: 0 },
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  sx={{ mb: 2, color: "#027c68" }}
+                >
+                  Month-Wise Legend
+                </Typography>
+                {monthlyAnimalData.map((entry, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mb: 1.5,
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: "50%",
+                        backgroundColor:
+                          MONTH_COLORS[index % MONTH_COLORS.length],
+                      }}
+                    />
+                    <Typography variant="body2" fontWeight="medium">
+                      {entry.month}: {entry.count}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             </Box>
           </Card>
         </Grid>
@@ -566,3 +790,6 @@ const AnnouncementPage: React.FC = () => {
 };
 
 export default AnnouncementPage;
+function setLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}

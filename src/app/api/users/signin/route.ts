@@ -81,6 +81,8 @@ export async function PATCH(request: NextRequest) {
 
     // ✅ Extract session token from cookies
     const token = request.cookies.get("session")?.value;
+    console.log("🔑 Session Token:", token); // Log the token for debugging
+
     if (!token) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -89,7 +91,6 @@ export async function PATCH(request: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
       userId: string;
     };
-
     console.log("🔍 Extracted User ID from Session:", decoded.userId);
 
     if (!mongoose.Types.ObjectId.isValid(decoded.userId)) {
@@ -99,14 +100,16 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const reqBody = await request.json();
-    const { username, email } = reqBody;
-
+    // ✅ Fetch the user from the employeeAuth collection by decoded userId
     const existingUser = await employeeAuth.findById(decoded.userId);
 
     if (!existingUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
+
+    // ✅ Get request body data
+    const reqBody = await request.json();
+    const { username, email } = reqBody;
 
     let isUpdated = false;
 
@@ -124,6 +127,7 @@ export async function PATCH(request: NextRequest) {
       isUpdated = true;
     }
 
+    // ✅ Save the updated user details
     if (isUpdated) {
       await existingUser.save();
       return NextResponse.json(
@@ -147,22 +151,35 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
 // GET API to fetch user details
 export async function GET(request: NextRequest) {
   try {
+    await connect(); // Connect to MongoDB
+
     const session = (await getServerSession(authOptions)) as {
-      user?: { username: string; email: string };
+      user?: { email: string };
     } | null;
 
     console.log("🟢 Session Data from API:", session); // Debugging
 
-    if (!session || !session.user) {
+    if (!session || !session.user?.email) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    // Query MongoDB for the user based on the email
+    const employee = await employeeAuth.findOne(
+      { email: session.user.email },
+      { username: 1, email: 1, _id: 0 } // Only fetch username and email
+    );
+
+    if (!employee) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({
       message: "Authenticated",
-      user: session.user, // Should contain username & email
+      user: { username: employee.username, email: employee.email },
     });
   } catch (error) {
     console.error("❌ Error fetching session:", error);

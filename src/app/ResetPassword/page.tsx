@@ -26,24 +26,22 @@ const ResetPassword = () => {
       email,
       newPassword,
       confirmPassword,
-      token,
     });
 
     try {
       const res = await fetch("/api/users/resetPassword", {
-        method: "PATCH", // Changed from POST to PATCH to match API
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword, confirmPassword, token }), // Include token
+        method: "PATCH", // Correct HTTP method
+        body: JSON.stringify({ email, newPassword, confirmPassword }), // Include email and passwords
       });
 
-      const data = await res.json();
-      console.log("Response received:", data); // Debugging log
+      const data = await res.json(); // Parse the JSON response
+      console.log("Response received:", data);
 
-      if (data.success) {
+      if (res.ok && data.success) {
         setSuccess("Password has been successfully reset.");
         setTimeout(() => {
           setSuccess(""); // Clear message before redirecting
-          router.push("/login"); // Redirect to login page
+          router.push("/"); // Redirect to login page after 2 seconds
         }, 2000);
       } else {
         setError(data.message || "Failed to reset password.");
@@ -117,13 +115,7 @@ const ResetPassword = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             sx={{ mb: 2 }}
           />
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mb: 2 }}
-            href="/"
-          >
+          <Button type="submit" variant="contained" fullWidth sx={{ mb: 2 }}>
             Reset Password
           </Button>
         </form>

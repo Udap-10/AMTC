@@ -1,10 +1,10 @@
 import {
-  IconBellRinging,
   IconChartBar,
   IconLayoutDashboard,
+  IconPaw,
   IconSettings,
+  IconUser,
   IconUsersGroup,
-  IconUser
 } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
@@ -19,15 +19,9 @@ const Menuitems = [
 
   {
     id: uniqueId(),
-    title: "Notification",
-    icon: IconBellRinging,
-    href: "/DashboardLayout/Notification-Page",
-  },
-  {
-    id: uniqueId(),
-    title: "About Us",
-    icon: IconUsersGroup,
-    href: "/DashboardLayout/AboutUs-Page",
+    title: "System Owner",
+    icon: IconUser,
+    href: "/DashboardLayout/SystemOwner-Page",
   },
 
   {
@@ -36,11 +30,24 @@ const Menuitems = [
     icon: IconChartBar,
     href: "/DashboardLayout/DataAnalysis-Page",
   },
+
+  {
+    id: uniqueId(),
+    title: "Animal Cateory",
+    icon: IconPaw,
+    href: "/DashboardLayout/AnimalCategory-Page",
+  },
   {
     id: uniqueId(),
     title: "Setting",
     icon: IconSettings,
     href: "/DashboardLayout/setting-page",
+  },
+  {
+    id: uniqueId(),
+    title: "About Us",
+    icon: IconUsersGroup,
+    href: "/DashboardLayout/AboutUs-Page",
   },
 ];
 

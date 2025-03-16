@@ -7,10 +7,23 @@ import { NextRequest, NextResponse } from "next/server";
 // Handle GET request to fetch all users
 
 // Handle GET request to fetch all animals (only name, owner, and date)
+// /api/Animals/route.ts
 export async function GET(req: NextRequest) {
   try {
     await connect();
-    const animals = await Animal.find()
+
+    const { searchParams } = new URL(req.url);
+    const year = searchParams.get("year");
+
+    const filter: any = {};
+    if (year) {
+      filter.Date = {
+        $gte: new Date(`${year}-01-01`),
+        $lte: new Date(`${year}-12-31T23:59:59.999Z`),
+      };
+    }
+
+    const animals = await Animal.find(filter)
       .select("name owner Date")
       .populate("owner", "name");
 

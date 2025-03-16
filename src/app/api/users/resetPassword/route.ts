@@ -5,11 +5,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(req: NextRequest) {
   try {
-    await connect(); // Ensure DB connection
+    console.log("Connecting to DB...");
+    await connect();
+    console.log("DB connected!");
 
     const { email, newPassword, confirmPassword } = await req.json();
+    console.log("Received request:", { email, newPassword, confirmPassword });
 
     if (!email || !newPassword || !confirmPassword) {
+      console.log("Missing fields in request");
       return new NextResponse(
         JSON.stringify({
           success: false,
@@ -20,6 +24,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (newPassword !== confirmPassword) {
+      console.log("Passwords do not match");
       return new NextResponse(
         JSON.stringify({
           success: false,
@@ -29,23 +34,28 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Debugging log
-    console.log("Password update request for email:", email);
-
-    const user = await employeeAuth.findOne({ email });
+    console.log("Looking for user with email:", email.toLowerCase());
+    const user = await employeeAuth.findOne({ email: email.toLowerCase() });
 
     if (!user) {
+      console.log("User not found");
       return new NextResponse(
         JSON.stringify({ success: false, message: "User not found" }),
         { status: 404 }
       );
     }
 
+    console.log("User found:", user);
+    console.log("Old password:", user.password);
+
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    user.password = hashedPassword;
+    console.log("New hashed password:", hashedPassword);
 
+    user.password = hashedPassword;
     await user.save();
+
+    console.log("Password updated successfully");
 
     return new NextResponse(
       JSON.stringify({

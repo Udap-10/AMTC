@@ -39,9 +39,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (CID.length !== 11 || contactNumber.length !== 8) {
+    if (contactNumber.length !== 8) {
       return NextResponse.json(
-        { message: "Invalid CID or Contact Number length." },
+        { message: "Invalid Contact Number length." },
         { status: 400 }
       );
     }

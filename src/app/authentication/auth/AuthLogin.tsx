@@ -1,3 +1,4 @@
+"use client";
 import CustomTextField from "@/app/DashboardLayout/components/forms/theme-elements/CustomTextField";
 import {
   Box,

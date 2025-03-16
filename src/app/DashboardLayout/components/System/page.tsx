@@ -46,6 +46,221 @@ const SystemsPage: React.FC = () => {
     router.push("/DashboardLayout/components/Animals");
   };
 
+  const locationData: { [key: string]: string[] } = {
+    Bumthang: ["Chhoekhor", "Chhume", "Tang", "Ura"],
+    Chhukha: [
+      "Bongo",
+      "Chapcha",
+      "Darla",
+      "Dungna",
+      "Geling",
+      "Getena",
+      "Lokchina",
+      "Metakha",
+      "Phuentsholing",
+      "Sampheling",
+    ],
+    Dagana: [
+      "Dorona",
+      "Gesarling",
+      "Gozhi",
+      "Kana",
+      "Khebisa",
+      "Lajab",
+      "Nichula",
+      "Tseza",
+      "Tsangkha",
+      "Tshendagang",
+      "Tseza",
+    ],
+    Gasa: ["Goenkhamey", "Goenkhatoe", "Laya", "Lunana"],
+    Haa: ["Bji", "Gakiling", "Katsho", "Samar", "Sangbay", "Uesu"],
+    Lhuentse: [
+      "Gangzur",
+      "Jarey",
+      "Khoma",
+      "Kurtoe",
+      "Menbi",
+      "Metsho",
+      "Mingkhar",
+      "Tsenkhar",
+    ],
+    Mongar: [
+      "Balam",
+      "Chaskhar",
+      "Chhali",
+      "Drametse",
+      "Drepung",
+      "Gongdue",
+      "Jurmey",
+      "Kengkhar",
+      "Mongar",
+      "Narang",
+      "Ngatshang",
+      "Saleng",
+      "Shermung",
+      "Silambi",
+      "Thangrong",
+      "Tsamang",
+    ],
+    Paro: [
+      "Doga",
+      "Doteng",
+      "Hungrel",
+      "Lamgong",
+      "Lungnyi",
+      "Naja",
+      "Shaba",
+      "Tsento",
+      "Wangchang",
+      "Shari",
+    ],
+    Pemagatshel: [
+      "Chhimung",
+      "Choekhorling",
+      "Chongshing",
+      "Dechheling",
+      "Dungmin",
+      "Khar",
+      "Nanong",
+      "Norbugang",
+      "Shumar",
+      "Yurung",
+      "Zobel",
+    ],
+    Punakha: [
+      "Chhubu",
+      "Dzome",
+      "Goenshari",
+      "Guma",
+      "Kabjisa",
+      "Lingmukha",
+      "Shenga Bjemi",
+      "Talo",
+      "Toewang",
+      "Toedwang",
+    ],
+    SamdrupJongkhar: [
+      "Dewathang",
+      "Gomdar",
+      "Langchenphu",
+      "Lauri",
+      "Martshala",
+      "Orong",
+      "Pemathang",
+      "Phuntshothang",
+      "Samrang",
+      "Serthi",
+      "Wangphu",
+    ],
+    Samtse: [
+      "Bara",
+      "Biru",
+      "Chahukha",
+      "Denchukha",
+      "Dophuchen",
+      "Dungtoe",
+      "Gomtu",
+      "Namgaycholing",
+      "Norgaygang",
+      "Phuentshogpelri",
+      "Samtse",
+      "Tading",
+      "Tendruk",
+      "Ugyentse",
+      "Yoeseltse",
+    ],
+    Sarpang: [
+      "Bhur",
+      "Chhuzagang",
+      "Dekiling",
+      "Gelephu",
+      "Jigmecholing",
+      "Samtenling",
+      "Serzhong",
+      "Shompangkha",
+      "Tareythang",
+      "Umling",
+    ],
+    Thimphu: [
+      "Kawang",
+      "Chang",
+      "Dagala",
+      "Genye",
+      "Lingzhi",
+      "Mewang",
+      "Naro",
+      "Soe",
+    ],
+    Trashigang: [
+      "Bartsham",
+      "Bidung",
+      "Kanglung",
+      "Kangpara",
+      "Khaling",
+      "Lumang",
+      "Merak",
+      "Phongmey",
+      "Radhi",
+      "Sakten",
+      "Samkhar",
+      "Shongphu",
+      "Thrimshing",
+      "Uzorong",
+      "Yangnyer",
+    ],
+    Trashiyangtse: [
+      "Bumdeling",
+      "Jamkhar",
+      "Khamdang",
+      "Ramjar",
+      "Toetsho",
+      "Tomzhangtshen",
+      "Yangtse",
+      "Yalang",
+    ],
+    Trongsa: ["Drakteng", "Korphu", "Langthil", "Nubi", "Tangsibji"],
+    Tsirang: [
+      "Barzhong",
+      "Goserling",
+      "Kikhorthang",
+      "Mendrelgang",
+      "Patala",
+      "Phuntenchhu",
+      "Rangthangling",
+      "Semjong",
+      "Tsholingkhar",
+      "Tsirangtoe",
+      "Dunglagang",
+      "Tsholingkhar",
+    ],
+    WangduePhodrang: [
+      "Athang",
+      "Bjena",
+      "Daga",
+      "Dangchu",
+      "Gangte",
+      "Gasetsho Gom",
+      "Gasetsho Wom",
+      "Nahi",
+      "Nyisho",
+      "Phangyul",
+      "Sephu",
+      "Thedtsho",
+      "Ruepisa",
+    ],
+    Zhemgang: [
+      "Bardo",
+      "Bjoka",
+      "Goshing",
+      "Nangkor",
+      "Ngangla",
+      "Phangkhar",
+      "Shingkhar",
+      "Trong",
+    ],
+  };
+
   // State for table pagination
   const [page, setPage] = useState(0);
   const rowsPerPage = 5;
@@ -54,10 +269,10 @@ const SystemsPage: React.FC = () => {
   const [tableData, setTableData] = useState(
     Array.from({ length: 20 }).map((_, index) => ({
       systemID: `SYS-${index + 1}`,
-      CID: `FID-${index + 1}`,
-      camera: "Enabled",
-      raspberryPi: `Model-${index + 1}`,
-      gsm: "On",
+      systemName: `FID-${index + 1}`,
+      password: "",
+      location: "",
+      macAddress: "",
       installationDate: new Date().toISOString(),
     }))
   );
@@ -71,10 +286,10 @@ const SystemsPage: React.FC = () => {
   // State for current row operations
   const [currentSystem, setCurrentSystem] = useState({
     systemID: "",
-    CID: "",
-    camera: "Enabled",
-    raspberryPi: "",
-    gsm: "On",
+    systemName: "",
+    password: "",
+    location: "",
+    macAddress: "",
     installationDate: "",
   });
 
@@ -151,10 +366,10 @@ const SystemsPage: React.FC = () => {
   const handleAddNewSystem = () => {
     setCurrentSystem({
       systemID: "",
-      CID: "",
-      camera: "Enabled",
-      raspberryPi: "",
-      gsm: "On",
+      systemName: "",
+      password: "",
+      location: "",
+      macAddress: "",
       installationDate: "",
     });
     setSelectedRowIndex(null);
@@ -166,35 +381,44 @@ const SystemsPage: React.FC = () => {
 
     const selectedSystem = tableData[index];
 
-    setCurrentSystem({ ...selectedSystem });
+    setCurrentSystem({
+      ...selectedSystem,
+      location: selectedSystem.location || "",
+      macAddress: selectedSystem.macAddress || "",
+      password: selectedSystem.password || "",
+    });
     setOpenAddEditDialog(true);
   };
 
-  // Handles both Add & Edit system
   const handleSubmitSystem = async () => {
     if (!currentSystem) return;
 
     const isEditing = selectedRowIndex !== null;
     const systemID = currentSystem.systemID;
 
+    // If you're not manually selecting installationDate, don't include it
     const systemData = {
-      CID: currentSystem.CID,
-      installationDate: currentSystem.installationDate,
-      camera: currentSystem.camera,
-      raspberryPi: currentSystem.raspberryPi,
-      gsm: currentSystem.gsm,
+      systemName: currentSystem.systemName,
+      location: currentSystem.location,
+      macAddress: currentSystem.macAddress,
+      password: currentSystem.password,
+      // Optional: Include only if you want to send it explicitly
+      // installationDate: currentSystem.installationDate
     };
 
     try {
+      let response;
+      let data;
+
       if (isEditing) {
-        // Editing an existing system (PUT request)
-        const response = await fetch(`/api/System?systemID=${systemID}`, {
-          method: "PUT",
+        // Editing existing system
+        response = await fetch(`/api/System?systemID=${systemID}`, {
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(systemData), // Only send changed fields
+          body: JSON.stringify(systemData),
         });
 
-        const data = await response.json();
+        data = await response.json();
 
         if (response.ok) {
           setTableData((prevData) =>
@@ -202,37 +426,41 @@ const SystemsPage: React.FC = () => {
               index === selectedRowIndex ? { ...row, ...systemData } : row
             )
           );
-          console.log("System updated successfully:", data);
+          alert("✅ System updated successfully!");
         } else {
-          console.error("Error:", data.message);
-          alert(data.message);
+          console.error("Error updating system:", data.message);
+          alert(`❌ ${data.message}`);
         }
       } else {
-        // Adding a new system (POST request)
-        const response = await fetch("/api/System", {
+        // Adding a new system
+        response = await fetch("/api/System", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ systemID, ...systemData }),
         });
 
-        const data = await response.json();
+        data = await response.json();
 
         if (response.ok) {
           setTableData((prevData) => [
             ...prevData,
-            { systemID, ...systemData },
+            {
+              systemID,
+              ...systemData,
+              installationDate: new Date().toISOString(),
+            },
           ]);
-          console.log("New system added successfully:", data);
+          alert("✅ New system added successfully!");
         } else {
-          console.error("Error:", data.message);
-          alert(data.message);
+          console.error("Error adding system:", data.message);
+          alert(`❌ ${data.message}`);
         }
       }
 
       setOpenAddEditDialog(false);
     } catch (error) {
-      console.error("Request failed", error);
-      alert("An error occurred. Please try again.");
+      console.error("Request failed:", error);
+      alert("❌ An error occurred. Please try again.");
     }
   };
 
@@ -260,6 +488,7 @@ const SystemsPage: React.FC = () => {
             prevData.filter((_, i) => i !== rowToDelete)
           );
           setRowToDelete(null);
+          alert("✅ System deleted successfully!"); // Success message
         } else {
           console.error("Error:", data.message);
           alert(data.message); // Show error message to the user
@@ -376,11 +605,12 @@ const SystemsPage: React.FC = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>System ID</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>CID</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Camera</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Raspberry Pi</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>GSM</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Initial Date</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>System Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Location</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>MAC Address</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Installation Date
+                </TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -390,10 +620,9 @@ const SystemsPage: React.FC = () => {
                 .map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{row.systemID}</TableCell>
-                    <TableCell>{row.CID}</TableCell>
-                    <TableCell>{row.camera}</TableCell>
-                    <TableCell>{row.raspberryPi}</TableCell>
-                    <TableCell>{row.gsm}</TableCell>
+                    <TableCell>{row.systemName}</TableCell>
+                    <TableCell>{row.location}</TableCell>
+                    <TableCell>{row.macAddress}</TableCell>
                     <TableCell>{row.installationDate.split("T")[0]}</TableCell>
 
                     <TableCell>
@@ -441,45 +670,51 @@ const SystemsPage: React.FC = () => {
             margin="normal"
           />
           <TextField
-            name="CID"
-            label="CID"
-            value={currentSystem.CID}
+            name="systemName"
+            label="System Name"
+            value={currentSystem.systemName}
             onChange={handleInputChange}
             fullWidth
             margin="normal"
           />
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Camera</InputLabel>
-            <Select
-              name="camera"
-              value={currentSystem.camera}
-              onChange={handleSelectChange}
-              label="Camera"
-            >
-              <MenuItem value="Enabled">Enabled</MenuItem>
-              <MenuItem value="Disabled">Disabled</MenuItem>
-            </Select>
-          </FormControl>
           <TextField
-            name="raspberryPi"
-            label="Raspberry Pi"
-            value={currentSystem.raspberryPi}
+            name="password"
+            label="Password"
+            value={currentSystem.password}
             onChange={handleInputChange}
             fullWidth
             margin="normal"
           />
           <FormControl fullWidth margin="normal">
-            <InputLabel>GSM</InputLabel>
+            <InputLabel>Location</InputLabel>
             <Select
-              name="gsm"
-              value={currentSystem.gsm}
+              name="location"
+              value={currentSystem.location}
               onChange={handleSelectChange}
-              label="GSM"
+              label="Location"
             >
-              <MenuItem value="On">On</MenuItem>
-              <MenuItem value="Off">Off</MenuItem>
+              {Object.entries(locationData).map(([dzongkhag, gewogs]) =>
+                gewogs.map((gewog) => (
+                  <MenuItem
+                    key={`${dzongkhag}-${gewog}`}
+                    value={`${dzongkhag} - ${gewog}`}
+                  >
+                    {dzongkhag} - {gewog}
+                  </MenuItem>
+                ))
+              )}
             </Select>
           </FormControl>
+
+          <TextField
+            name="macAddress"
+            label="MAC Address"
+            value={currentSystem.macAddress}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+          />
+
           <TextField
             name="installationDate"
             label="Initial Date"

@@ -1,7 +1,22 @@
 "use client";
 import DevicesIcon from "@mui/icons-material/Devices";
 import PeopleIcon from "@mui/icons-material/People";
-import { Box, Card, Divider, Grid, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Card,
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
@@ -23,35 +38,54 @@ const AnimalsPage: React.FC = () => {
   const [currentMonthData, setCurrentMonthData] = useState<any[]>([]);
   const [farmersData, setFarmersData] = useState<any[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
-  const [animalTypesData, setAnimalTypesData] = useState<any[]>([]); // State for animal types chart data
+  const [animalTypesData, setAnimalTypesData] = useState<any[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
 
-  // Fetch animal detection data from the backend
+  const fixedAnimalTypes = [
+    "Bear",
+    "Boar",
+    "Cattle",
+    "Deer",
+    "Elephant",
+    "Horse",
+    "Monkey",
+    "Raccoon",
+  ];
+
+  const populatedChartData = fixedAnimalTypes.map((animal) => {
+    const match = animalTypesData.find((item) => item.name === animal);
+    return {
+      name: animal,
+      count: match ? match.count : 0,
+    };
+  });
+
   useEffect(() => {
     const fetchAnimalData = async () => {
       try {
-        const response = await fetch("/api/Animals");
+        const response = await fetch(`/api/Animals?year=${selectedYear}`);
         const data = await response.json();
 
         if (data.success) {
           const animals = data.animals;
 
-          // Formatting the data for animal detections (by full date)
           const formattedData = animals.map((animal: any) => ({
-            date: new Date(animal.Date).toLocaleDateString("en-GB"), // Format as DD/MM/YYYY (can customize as needed)
-            animalsDetected: 1, // For simplicity, assuming one animal per record
+            date: new Date(animal.Date).toLocaleDateString("en-GB"),
+            animalsDetected: 1,
           }));
 
           setAnimalData(formattedData);
-          setCurrentMonthData(formattedData);
+          setCurrentMonthData(formattedData); // Assuming you want to set monthwise view too
 
-          // Formatting data for the animal types chart
           const formattedAnimalTypesData = animals.reduce(
             (acc: any[], animal: any) => {
               const existing = acc.find((item) => item.name === animal.name);
               if (existing) {
-                existing.count += 1; // Increment the count for this animal type
+                existing.count += 1;
               } else {
-                acc.push({ name: animal.name, count: 1 }); // Add new animal type
+                acc.push({ name: animal.name, count: 1 });
               }
               return acc;
             },
@@ -67,16 +101,14 @@ const AnimalsPage: React.FC = () => {
     };
 
     fetchAnimalData();
-  }, []);
+  }, [selectedYear]); // <-- key change
 
-  // Fetch farmers data
   useEffect(() => {
     const fetchFarmersData = async () => {
       try {
         const response = await fetch("/api/Farmer");
         const data = await response.json();
         setFarmersData(data);
-        console.log(data);
       } catch (error) {
         console.error("Error fetching farmers data:", error);
       }
@@ -84,7 +116,6 @@ const AnimalsPage: React.FC = () => {
     fetchFarmersData();
   }, []);
 
-  // Fetch systems data
   useEffect(() => {
     fetchSystems();
   }, []);
@@ -95,26 +126,6 @@ const AnimalsPage: React.FC = () => {
     setTableData(data);
   };
 
-  // Aggregate animal data by date
-  const aggregateAnimalData = (data: any[]) => {
-    const aggregatedData: { [key: string]: number } = {}; // Use string (date) as the key
-    data.forEach((entry: { date: string; animalsDetected: number }) => {
-      const { date, animalsDetected } = entry;
-      if (aggregatedData[date]) {
-        aggregatedData[date] += animalsDetected;
-      } else {
-        aggregatedData[date] = animalsDetected;
-      }
-    });
-
-    // Convert the aggregated data into an array of objects
-    return Object.keys(aggregatedData).map((date) => ({
-      date,
-      animalsDetected: aggregatedData[date],
-    }));
-  };
-
-  // Navigate to the number of farmers page
   const handleFarmersCardClick = () => {
     router.push("/DashboardLayout/components/farmers");
   };
@@ -123,9 +134,16 @@ const AnimalsPage: React.FC = () => {
     router.push("/DashboardLayout/components/System");
   };
 
+  const handlePrevious = () => {
+    setSelectedYear((prevYear) => prevYear - 1);
+  };
+
+  const handleNext = () => {
+    setSelectedYear((prevYear) => prevYear + 1);
+  };
+
   return (
     <Box sx={{ padding: 2 }}>
-      {/* Cards at the top */}
       <Grid container spacing={3} sx={{ marginBottom: 3 }}>
         <Grid item xs={12} sm={6} md={4}>
           <Card
@@ -135,9 +153,9 @@ const AnimalsPage: React.FC = () => {
               textAlign: "center",
               borderRadius: "12px",
               backgroundColor: "#b0e892",
-              minHeight: "150px", // Ensure the card has a minimum height
+              minHeight: "150px",
             }}
-            onClick={handleFarmersCardClick} // Navigate to the farmers page
+            onClick={handleFarmersCardClick}
           >
             <Box
               sx={{ display: "flex", alignItems: "center", marginBottom: 1 }}
@@ -168,9 +186,9 @@ const AnimalsPage: React.FC = () => {
               textAlign: "center",
               borderRadius: "12px",
               backgroundColor: "#b0e892",
-              minHeight: "150px", // Ensure the card has a minimum height
+              minHeight: "150px",
             }}
-            onClick={handleSystemsCardClick} // Navigate to the systems page
+            onClick={handleSystemsCardClick}
           >
             <Box
               sx={{ display: "flex", alignItems: "center", marginBottom: 1 }}
@@ -194,27 +212,71 @@ const AnimalsPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* Bar Chart for Animal Detection */}
       <Grid container spacing={3} sx={{ marginBottom: 3 }}>
         <Grid item xs={12}>
-          <Card elevation={3} sx={{ padding: 3, borderRadius: "12px" }}>
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              color="forestgreen"
-              sx={{ marginBottom: 2 }}
+          <Card elevation={3} sx={{ padding: 5, borderRadius: "12px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
             >
-              Animal Detection by Type
-            </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  mb: 1,
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" color="forestgreen">
+                  Animal Detection by Type
+                </Typography>
+              </Box>
+
+              {/* Year Navigation on the right */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  justifyContent: "flex-start", // 👈 Add this
+                }}
+              >
+                <IconButton
+                  onClick={handlePrevious}
+                  sx={{ color: "#027c68", fontSize: 28, fontWeight: "bold" }}
+                >
+                  &lt;
+                </IconButton>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  sx={{ fontSize: 20 }}
+                >
+                  {selectedYear}
+                </Typography>
+                <IconButton
+                  onClick={handleNext}
+                  sx={{ color: "#027c68", fontSize: 28, fontWeight: "bold" }}
+                >
+                  &gt;
+                </IconButton>
+              </Box>
+            </Box>
+
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={animalTypesData}>
+              <BarChart data={populatedChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
                   label={{
                     value: "Animals",
                     position: "insideBottom",
-                    offset: -5, // Moves the label 10 units down
+                    offset: -5,
+                    style: { fill: "#000", fontWeight: "bold" }, // dark and bold
                   }}
                 />
                 <YAxis
@@ -223,8 +285,10 @@ const AnimalsPage: React.FC = () => {
                     angle: -90,
                     position: "insideLeft",
                     offset: 0,
+                    style: { fill: "#000", fontWeight: "bold" }, // dark and bold
                   }}
                 />
+
                 <Tooltip />
                 <Bar dataKey="count" fill="#027c68" />
               </BarChart>
@@ -233,7 +297,6 @@ const AnimalsPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* Animal Detection List Section */}
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Card
@@ -248,36 +311,57 @@ const AnimalsPage: React.FC = () => {
             <Typography
               variant="h6"
               fontWeight="bold"
-              color="forestgreen"
               sx={{
                 marginBottom: 2,
                 color: isDarkMode ? "#90caf9" : "forestgreen",
               }}
             >
-              Animal Detection Details
+              Animal Detection Summary
             </Typography>
-            {aggregateAnimalData(animalData).map((data, index) => (
-              <Box
-                key={index}
-                sx={{
-                  padding: 1,
-                  marginBottom: 2,
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "8px",
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontWeight: "bold",
-                    color: isDarkMode ? "#0009" : "#000",
-                  }}
-                >
-                  Date {data.date}: {data.animalsDetected} animals detected
-                </Typography>
-                {/* You can add more details here */}
-              </Box>
-            ))}
+            <TableContainer
+              component={Paper}
+              sx={{
+                backgroundColor: isDarkMode ? "#2a2a2a" : "#f9f9f9",
+                maxWidth: "600px",
+                margin: "auto",
+              }}
+            >
+              <Table size="small">
+                <TableHead>
+                  <TableRow
+                    sx={{
+                      backgroundColor: isDarkMode ? "#333" : "#d3f4cd",
+                    }}
+                  >
+                    <TableCell
+                      align="center"
+                      sx={{
+                        fontWeight: "bold",
+                        borderRight: "1px solid #ccc",
+                      }}
+                    >
+                      Animal Type
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Total Count
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {animalTypesData.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell
+                        align="center"
+                        sx={{ borderRight: "1px solid #ccc" }}
+                      >
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="center">{row.count}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Card>
         </Grid>
       </Grid>
@@ -286,3 +370,6 @@ const AnimalsPage: React.FC = () => {
 };
 
 export default AnimalsPage;
+function setSelectedYear(arg0: (prevYear: any) => number) {
+  throw new Error("Function not implemented.");
+}

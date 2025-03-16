@@ -395,7 +395,7 @@ const FarmersPage: React.FC = () => {
           color="forestgreen"
           sx={{ marginBottom: 2 }}
         >
-          Number of Farmers
+          Farmer Information
         </Typography>
 
         <Box
@@ -404,10 +404,11 @@ const FarmersPage: React.FC = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: 2,
-            gap: 2,
+            gap: 3, // Increased gap to create space between both sections
           }}
         >
-          <Box sx={{ display: "flex", gap: 2 }}>
+          {/* Left Section: Dzongkhag & Reset Filter Buttons */}
+          <Box sx={{ display: "flex", gap: 5, alignItems: "center" }}>
             <Button
               variant="outlined"
               startIcon={<FilterListIcon />}
@@ -416,6 +417,8 @@ const FarmersPage: React.FC = () => {
                 borderColor: "#99cc66",
                 color: "black",
                 borderRadius: "8px",
+                width: "150px", // Fixed width for better alignment
+                height: "50px", // Fixed height for better alignment
                 "&:hover": { backgroundColor: "#f4f8f1" },
               }}
             >
@@ -446,42 +449,24 @@ const FarmersPage: React.FC = () => {
 
             <Button
               variant="outlined"
-              startIcon={<FilterListIcon />}
-              onClick={handleSystemFilterClick}
-              sx={{
-                borderColor: "#99cc66",
-                color: "black",
-                borderRadius: "8px",
-                "&:hover": { backgroundColor: "#f4f8f1" },
-              }}
-            >
-              System ID
-            </Button>
-            <Menu
-              anchorEl={anchorElSystem}
-              open={Boolean(anchorElSystem)}
-              onClose={() => handleSystemFilterClose(null)}
-            >
-              {[1, 2, 3].map((id) => (
-                <MenuItem key={id} onClick={() => handleSystemFilterClose(id)}>
-                  {id}
-                </MenuItem>
-              ))}
-            </Menu>
-            <Button
-              variant="outlined"
               onClick={resetFilters}
               sx={{
                 borderColor: "#99cc66",
                 color: "black",
                 borderRadius: "8px",
+                width: "150px", // Fixed width for better alignment
+                height: "50px", // Fixed height for better alignment
+                display: "flex",
+
                 "&:hover": { backgroundColor: "#f4f8f1" },
               }}
             >
               Reset Filters
             </Button>
           </Box>
-          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+
+          {/* Right Section: Add New Member Button & Search Input */}
+          <Box sx={{ display: "flex", gap: 5, alignItems: "center" }}>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -492,11 +477,13 @@ const FarmersPage: React.FC = () => {
                 backgroundColor: "#99cc66",
                 color: "#fff",
                 borderRadius: "8px",
+                height: "50px", // Fixed height for better alignment
                 "&:hover": { backgroundColor: "#85b358" },
               }}
             >
               Add New Member
             </Button>
+
             <TextField
               placeholder="Search"
               variant="outlined"
@@ -504,7 +491,8 @@ const FarmersPage: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               sx={{
-                width: "40%",
+                width: "250px", // Fixed width for better alignment
+                height: "40 px", // Fixed height for better alignment
               }}
               InputProps={{
                 endAdornment: (
@@ -555,9 +543,7 @@ const FarmersPage: React.FC = () => {
                 <TableCell>
                   <strong>VILLAGE</strong>
                 </TableCell>
-                <TableCell>
-                  <strong>SYSTEM ID</strong>
-                </TableCell>
+
                 <TableCell>
                   <strong>ACTION</strong>
                 </TableCell>
@@ -606,9 +592,7 @@ const FarmersPage: React.FC = () => {
                     <TableCell sx={{ color: isDarkMode ? "#ddd" : "#000" }}>
                       {farmer.Village}
                     </TableCell>
-                    <TableCell sx={{ color: isDarkMode ? "#ddd" : "#000" }}>
-                      {farmer.systemID}
-                    </TableCell>
+
                     <TableCell>
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}

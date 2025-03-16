@@ -1,9 +1,7 @@
 import { connect } from "@/dbconfig/dbconfig";
 import Employee from "@/models/employeeModels";
-import authOptions from "@/utils/authOptions";
 import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
-import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 cloudinary.config({
@@ -107,16 +105,16 @@ export async function GET(req: NextRequest) {
   try {
     await connect();
 
-    // 🔹 Get user session properly
-    const session: { user?: { email?: string } } | null =
-      await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // ✅ Extract `userId` from query parameters
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json({ message: "Missing userId" }, { status: 400 });
     }
 
-    // 🔹 Extract user email from session
-    const { email } = session.user;
-    const user = await Employee.findOne({ email });
+    // ✅ Find user by `userId` field (not `_id`)
+    const user = await Employee.findOne({ userId });
 
     if (!user || !user.profilePhoto) {
       return NextResponse.json(

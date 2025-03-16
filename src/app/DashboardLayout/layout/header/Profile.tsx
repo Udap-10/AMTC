@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null);
+  const [profilePhoto, setProfilePhoto] = useState("/default-avatar.png");
 
   const handleClick2 = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl2(event.currentTarget);
@@ -23,33 +24,41 @@ const Profile = () => {
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
-  const [profileData, setProfileData] = useState({
-    profilePhoto: "",
-  });
+
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const fetchProfileImage = async () => {
       const userId = localStorage.getItem("_id");
 
       if (!userId) {
-        console.warn("⚠️ User ID not found in localStorage. Skipping fetch.");
+        console.warn("⚠️ No user ID found in localStorage.");
+        return;
+      }
+
+      const cachedPhoto = localStorage.getItem("profilePhoto");
+      if (cachedPhoto) {
+        setProfilePhoto(cachedPhoto);
         return;
       }
 
       try {
-        const imageResponse = await fetch(`/api/users/image?userId=${userId}`);
-
-        if (!imageResponse.ok) throw new Error("Failed to fetch profile photo");
-
-        const imageData = await imageResponse.json();
-
-        // Store profile photo URL in localStorage
-        localStorage.setItem("profilePhoto", imageData.profilePhoto);
+        const res = await fetch(`/api/users/image?userId=${userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.profilePhoto) {
+            setProfilePhoto(data.profilePhoto);
+            localStorage.setItem("profilePhoto", data.profilePhoto);
+          } else {
+            console.warn("⚠️ No profilePhoto in API response");
+          }
+        } else {
+          console.warn("⚠️ Failed to fetch profile image from API");
+        }
       } catch (error) {
-        console.error("❌ Error fetching profile:", error);
+        console.error("❌ Error fetching profile image:", error);
       }
     };
 
-    fetchProfileData();
+    fetchProfileImage();
   }, []);
 
   const handleLogout = async () => {
@@ -61,12 +70,14 @@ const Profile = () => {
 
       if (response.ok) {
         console.log("✅ Logged out successfully");
+        localStorage.removeItem("_id");
+        localStorage.removeItem("profilePhoto");
         window.location.href = "/authentication/login";
       } else {
-        console.error("❌ Failed to logout");
+        console.error("❌ Logout failed");
       }
-    } catch (error) {
-      console.error("❌ Error logging out:", error);
+    } catch (err) {
+      console.error("❌ Error during logout:", err);
     }
   };
 
@@ -74,42 +85,31 @@ const Profile = () => {
     <Box>
       <IconButton
         size="large"
-        aria-label="show 11 new notifications"
+        aria-label="show profile"
         color="inherit"
-        aria-controls="msgs-menu"
+        aria-controls="profile-menu"
         aria-haspopup="true"
         onClick={handleClick2}
         sx={{
-          ...(typeof anchorEl2 === "object" && {
-            color: "primary.main",
-          }),
+          ...(anchorEl2 && { color: "primary.main" }),
         }}
       >
         <Avatar
-          src={localStorage.getItem("profilePhoto") || profileData.profilePhoto}
+          src={profilePhoto}
           alt="Profile Image"
-          sx={{
-            width: 35,
-            height: 35,
-          }}
+          sx={{ width: 35, height: 35 }}
         />
       </IconButton>
-      {/* ------------------------------------------- */}
-      {/* Message Dropdown */}
-      {/* ------------------------------------------- */}
+
       <Menu
-        id="msgs-menu"
+        id="profile-menu"
         anchorEl={anchorEl2}
         keepMounted
         open={Boolean(anchorEl2)}
         onClose={handleClose2}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
-        sx={{
-          "& .MuiMenu-paper": {
-            width: "200px",
-          },
-        }}
+        sx={{ "& .MuiMenu-paper": { width: "200px" } }}
       >
         <MenuItem
           component={Link}
@@ -124,10 +124,8 @@ const Profile = () => {
 
         <Box mt={1} py={1} px={2}>
           <Button
-            href="/authentication/login"
             variant="outlined"
             color="primary"
-            component={Link}
             fullWidth
             onClick={handleLogout}
           >
@@ -138,4 +136,5 @@ const Profile = () => {
     </Box>
   );
 };
+
 export default Profile;

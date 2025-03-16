@@ -1,21 +1,33 @@
 import mongoose from "mongoose";
 
 const SystemSchema = new mongoose.Schema({
-  systemID: { type: Number, required: true, unique: true }, // Primary Key
-  CID: {
+  systemID: {
+    type: String,
+    required: true,
+    unique: true, // Primary Key
+  },
+  systemName: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  macAddress: {
     type: String,
     required: true,
     unique: true,
-    ref: "User", // Establishing CID as a foreign key reference
   },
-  installationDate: { type: Date, required: true },
-  camera: { type: String, enum: ["Enabled", "Disabled"] },
-  gsm: { type: String, enum: ["On", "Off"] },
-  raspberryPi: {
-    type: String,
+  installationDate: {
+    type: Date,
     required: true,
+    default: Date.now,
   },
 });
 
-// Ensure a single instance of the model
 export default mongoose.models.System || mongoose.model("System", SystemSchema);
