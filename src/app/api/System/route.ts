@@ -1,6 +1,6 @@
 import { connect } from "@/dbconfig/dbconfig";
 import SystemDetails from "@/models/SystemDetails";
-import System from "@/models/systemModels";
+import { SystemAdmin } from "@/models/systemModels";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET: Fetch all systems or a specific system by systemID
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     let systems;
     if (systemID) {
-      systems = await System.findOne({ systemID: systemID });
+      systems = await SystemAdmin.findOne({ systemID: systemID });
       if (!systems) {
         return NextResponse.json(
           { message: "System not found" },
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         );
       }
     } else {
-      systems = await System.find(); // fetch all if no systemID
+      systems = await SystemAdmin.find(); // fetch all if no systemID
     }
 
     return NextResponse.json(systems, { status: 200 });
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     await connect();
 
-    const systemExists = await System.findOne({ systemID });
+    const systemExists = await SystemAdmin.findOne({ systemID });
     if (systemExists) {
       return NextResponse.json(
         { message: "System ID already exists" },
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const newSystem = new System({
+    const newSystem = new SystemAdmin({
       systemID,
       systemName,
       password,
@@ -113,7 +113,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const updatedSystem = await System.findOneAndUpdate(
+    const updatedSystem = await SystemAdmin.findOneAndUpdate(
       { systemID },
       { $set: updateData },
       { new: true, runValidators: true }
@@ -150,7 +150,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     }
 
     // Delete from System schema
-    const deleteResult = await System.deleteOne({ systemID });
+    const deleteResult = await SystemAdmin.deleteOne({ systemID });
 
     if (deleteResult.deletedCount === 0) {
       return NextResponse.json(

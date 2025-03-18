@@ -266,16 +266,7 @@ const SystemsPage: React.FC = () => {
   const rowsPerPage = 5;
 
   // State for the table data
-  const [tableData, setTableData] = useState(
-    Array.from({ length: 20 }).map((_, index) => ({
-      systemID: `SYS-${index + 1}`,
-      systemName: `FID-${index + 1}`,
-      password: "",
-      location: "",
-      macAddress: "",
-      installationDate: new Date().toISOString(),
-    }))
-  );
+  const [tableData, setTableData] = useState<any[]>([]);
   const [farmersData, setFarmersData] = useState<any[]>([]);
   const [animalData, setAnimalData] = useState<any[]>([]);
 
@@ -598,7 +589,7 @@ const SystemsPage: React.FC = () => {
           color="forestgreen"
           sx={{ marginBottom: 2 }}
         >
-          System Information
+          Allocated Systems
         </Typography>
         <TableContainer component={Paper} elevation={0}>
           <Table>

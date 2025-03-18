@@ -25,9 +25,13 @@ const AnimalSchema = new mongoose.Schema({
     default: null,
   },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
+  // ✅ Add this field to store dzongkhag even if owner is deleted
+  ownerDzongkhag: {
+    type: String,
+    required: false,
+  },
 });
 
-// ✅ Prevent OverwriteModelError
 const Animal = mongoose.models.Animal || mongoose.model("Animal", AnimalSchema);
-
 export default Animal;

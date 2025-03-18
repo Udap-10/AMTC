@@ -17,17 +17,23 @@ export async function GET(req: Request) {
       };
     }
 
+    // Fetch animals and populate owner Dzongkhag (if owner still exists)
     const animals = await Animal.find(filter).populate("owner", "Dzongkhag");
 
     const dzongkhagCountMap: Record<string, number> = {};
     const animalTypesMap: Record<string, Record<string, number>> = {};
 
     animals.forEach((animal) => {
-      const dzongkhag = animal.owner?.Dzongkhag || "Unknown";
+      // ✅ Fallback to animal.ownerDzongkhag if owner is deleted
+      const dzongkhag =
+        animal.owner?.Dzongkhag || animal.ownerDzongkhag || "Unknown";
+
       const animalName = animal.name || "Unknown";
 
+      // Count animals per Dzongkhag
       dzongkhagCountMap[dzongkhag] = (dzongkhagCountMap[dzongkhag] || 0) + 1;
 
+      // Count animal types per Dzongkhag
       if (!animalTypesMap[dzongkhag]) {
         animalTypesMap[dzongkhag] = {};
       }
@@ -45,7 +51,7 @@ export async function GET(req: Request) {
       animalTypesPerDzongkhag: animalTypesMap,
     });
   } catch (error) {
-    console.error("Error in API:", error);
+    console.error("Error in Animal API:", error);
     return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }

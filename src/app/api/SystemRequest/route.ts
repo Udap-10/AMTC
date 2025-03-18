@@ -1,6 +1,6 @@
 import { connect } from "@/dbconfig/dbconfig";
 import SystemDetails from "@/models/SystemDetails";
-import System from "@/models/systemModels";
+import { SystemAdmin } from "@/models/systemModels";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -40,7 +40,9 @@ export async function DELETE(req: { url: string | URL }) {
     });
 
     // Delete from System schema (based on same systemID)
-    const deletedSystem = await System.findOneAndDelete({ systemID: systemId });
+    const deletedSystem = await SystemAdmin.findOneAndDelete({
+      systemID: systemId,
+    });
 
     if (!deletedSystemDetails && !deletedSystem) {
       return NextResponse.json(

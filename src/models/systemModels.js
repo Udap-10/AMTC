@@ -30,4 +30,5 @@ const SystemSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.System || mongoose.model("System", SystemSchema);
+export const SystemAdmin =
+  mongoose.models.SystemAdmin || mongoose.model("SystemAdmin", SystemSchema);

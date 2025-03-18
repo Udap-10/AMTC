@@ -30,7 +30,7 @@ export async function GET(req: NextResponse) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    let { name, CID, contactNumber, Dzongkhag, Gewog, Village, animals } = body;
+    let { name, CID, contactNumber, Dzongkhag, Gewog, Village } = body;
 
     if (!name || !CID || !contactNumber) {
       return NextResponse.json(
@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
       Dzongkhag,
       Gewog,
       Village,
-      animals,
     });
     await newUser.save();
 

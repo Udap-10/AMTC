@@ -311,7 +311,7 @@ const AddMember: React.FC = () => {
       setDzongkhag("");
       setGewog("");
       setVillage("");
-      setSystemID(1); // Reset to default value
+      // Reset to default value
 
       // Redirect after a delay
       setTimeout(
