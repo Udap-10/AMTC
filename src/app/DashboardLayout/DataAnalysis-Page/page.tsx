@@ -58,7 +58,7 @@ const allDzongkhags = [
   "Trashiyangtse",
   "Trongsa",
   "Tsirang",
-  "Wangdue Phodrang",
+  "WangduePhodrang",
   "Zhemgang",
 ];
 
@@ -145,24 +145,24 @@ const DataAnalysisPage = () => {
         const data = await response.json();
 
         if (data.success) {
-          // Update chart counts
+          // ✅ Ensure all 20 dzongkhags (from allDzongkhags) are accounted for in the counts
           const updatedCounts = allDzongkhags.map((dzongkhag) => {
             const index = data.dzongkhags.indexOf(dzongkhag);
             return index !== -1 ? data.animalCounts[index] : 0;
           });
           setAnimalCounts(updatedCounts);
 
-          // Update Animal types per Dzongkhag
+          // ✅ Convert animal types per dzongkhag (with fallback for missing dzongkhags)
           const convertedAnimalTypes: Record<string, string[]> = {};
-          Object.keys(data.animalTypesPerDzongkhag).forEach((dzongkhag) => {
-            const types = data.animalTypesPerDzongkhag[dzongkhag];
+          allDzongkhags.forEach((dzongkhag) => {
+            const types = data.animalTypesPerDzongkhag[dzongkhag] || {};
             convertedAnimalTypes[dzongkhag] = Object.entries(types).map(
               ([animalName, count]) => `${animalName} (${count})`
             );
           });
           setAnimalTypesByDzongkhag(convertedAnimalTypes);
 
-          // Update summary metrics
+          // ✅ Update summary metrics
           const total = updatedCounts.reduce((sum, count) => sum + count, 0);
           const average =
             updatedCounts.length > 0
@@ -184,7 +184,7 @@ const DataAnalysisPage = () => {
     };
 
     fetchData();
-  }, [selectedYear]); // 🔥 Now this re-runs whenever selectedYear changes
+  }, [selectedYear]);
 
   const chartData = {
     labels: dzongkhagAbbr,
@@ -231,7 +231,10 @@ const DataAnalysisPage = () => {
           color: darkMode ? "#fff" : "#000",
           font: { size: 14, weight: 600 },
         },
-        ticks: { color: darkMode ? "#fff" : "#000", font: { size: 12 } },
+        ticks: {
+          color: darkMode ? "#fff" : "#000",
+          font: { size: 12 },
+        },
       },
       y: {
         beginAtZero: true,
@@ -241,7 +244,11 @@ const DataAnalysisPage = () => {
           color: darkMode ? "#fff" : "#000",
           font: { size: 14, weight: 600 },
         },
-        ticks: { color: darkMode ? "#fff" : "#000" },
+        ticks: {
+          color: darkMode ? "#fff" : "#000",
+          stepSize: 1, // 👈 Force integer steps
+          precision: 0, // 👈 Force integer display (no decimals)
+        },
       },
     },
   };

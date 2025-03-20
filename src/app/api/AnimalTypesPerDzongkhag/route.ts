@@ -17,18 +17,25 @@ export async function GET(req: Request) {
       };
     }
 
-    // Fetch animals and populate owner Dzongkhag (if owner still exists)
+    // Fetch animals and populate owner Dzongkhag
     const animals = await Animal.find(filter).populate("owner", "Dzongkhag");
 
     const dzongkhagCountMap: Record<string, number> = {};
     const animalTypesMap: Record<string, Record<string, number>> = {};
 
     animals.forEach((animal) => {
-      // ✅ Fallback to animal.ownerDzongkhag if owner is deleted
-      const dzongkhag =
-        animal.owner?.Dzongkhag || animal.ownerDzongkhag || "Unknown";
+      // 🐾 Use fallback and normalize Dzongkhag
+      let dzongkhag = "Unknown";
+      if (animal.owner && animal.owner.Dzongkhag) {
+        dzongkhag = animal.owner.Dzongkhag.trim();
+      } else if (animal.ownerDzongkhag) {
+        dzongkhag = animal.ownerDzongkhag.trim();
+      }
 
-      const animalName = animal.name || "Unknown";
+      // Log for debugging
+      console.log("Detected Dzongkhag:", dzongkhag);
+
+      const animalName = animal.name?.trim() || "Unknown";
 
       // Count animals per Dzongkhag
       dzongkhagCountMap[dzongkhag] = (dzongkhagCountMap[dzongkhag] || 0) + 1;
